@@ -21,6 +21,9 @@ app.use(cookieParser())
 import loginRoute from "./route/auth.route.js"
 app.use("/api",loginRoute)
 
+import addRawImli from "./route/addRawImli.route.js"
+app.use("/api",addRawImli)
+
 
 
 export {app}
