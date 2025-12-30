@@ -62,7 +62,7 @@ const Dashboard = () => {
   ]
 
   return (
-    <div className="p-8 bg-gray-100 min-h-screen">
+    <div className="p-8 bg-gray-100 ml-60 min-h-screen">
       {/* Stats Cards */}
       <div className="grid grid-cols-4 gap-6 mb-8">
         {stats.map((stat) => (
@@ -83,7 +83,7 @@ const Dashboard = () => {
       </div>
 
       {/* Activities and Quick Actions */}
-      <div className="grid grid-cols-3 gap-6 mb-8">
+      <div className="grid grid-cols-3 w-308 gap-6 mb-8">
         {/* Activities */}
         <div className="col-span-2 bg-white rounded-lg p-6">
           <h3 className="text-xl font-bold mb-6">RECENT ACTIVITIES</h3>
