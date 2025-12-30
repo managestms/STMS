@@ -16,7 +16,7 @@ const AddRawImli = () => {
     }
 
     try {
-      await api.post("/imli/add", {
+      await api.post("/addRawImli", {
         rawImliQuantity,
       })
 

@@ -8,6 +8,8 @@ export const addRawImli = asyncHandler(async (req, res) => {
   const { rawImliQuantity } = req.body;
 
   if (!rawImliQuantity) throw new ApiError(400, "imli quantity is required");
+  if (rawImliQuantity < 0) throw new ApiError(400, "imli quantity cannt be negative");
+
 
   const imli = await ImliData.findOneAndUpdate(
     {},
