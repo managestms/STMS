@@ -27,5 +27,10 @@ app.use("/api",addRawImli)
 import addLocal from "./route/addlocal.route.js"
 app.use("/api",addLocal)
 
+import getlocalData from "./route/getlocalDetail.js"
+app.use("/api",getlocalData)
+
+import assignImli from "./route/assignImli.route.js"
+app.use("/api",assignImli)
 
 export {app}
