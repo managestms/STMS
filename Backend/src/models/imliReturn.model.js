@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const imliAssignSchema = new mongoose.Schema(
+const imliReturnSchema = new mongoose.Schema(
   {
     localID: {
       type:String,
@@ -10,19 +10,16 @@ const imliAssignSchema = new mongoose.Schema(
       type: String,
       required: true
     },
-    assignedQuantity: {
+    returnedQuantity: {
       type: Number,
       required: true
     },
-    assignedBy: {
-      type: String, 
-      required: true
-    }
+   
   },
   { timestamps: true }
 );
 
-export const ImliAssign = mongoose.model(
-  "ImliAssign",
-  imliAssignSchema
+export const imliReturn = mongoose.model(
+  "imliReturn",
+  imliReturnSchema
 );

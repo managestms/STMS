@@ -33,4 +33,7 @@ app.use("/api",getlocalData)
 import assignImli from "./route/assignImli.route.js"
 app.use("/api",assignImli)
 
+import returnImli from "./route/returnedimli.route.js"
+app.use("/api",returnImli)
+
 export {app}

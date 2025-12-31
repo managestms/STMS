@@ -14,14 +14,22 @@ const localSchema = new Schema(
       type: String,
       required: true,
     },
-    LocalPhone:{
-         type:Number,
-        required:true
+    LocalPhone: {
+      type: Number,
+      required: true,
     },
-    LocalUPI:{
-         type:String,
-        required:true
-    }
+    LocalUPI: {
+      type: String,
+      required: true,
+    },
+    totalAssignedQuantity: {
+      type: Number,
+      default: 0,
+    },
+    totalReturnedQuantity: {
+      type: Number,
+      default: 0,
+    },
   },
   { timestamp: true }
 );
