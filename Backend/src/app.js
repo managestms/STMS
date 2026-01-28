@@ -36,4 +36,7 @@ app.use("/api",assignImli)
 import returnImli from "./route/returnedimli.route.js"
 app.use("/api",returnImli)
 
+import localop from "./route/localop.js"
+app.use("/api",localop)
+
 export {app}
