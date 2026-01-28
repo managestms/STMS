@@ -18,4 +18,6 @@ const return_local=asyncHandler(async(req , res)=>{
     );
 })
 
+const delete_local=asyncHandler(async(req , res)=>{
 export {return_local};
+
