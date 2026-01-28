@@ -8,6 +8,7 @@ import AddRawImli from "./AddRawImli"
 import AssignImli from "./AssignImli"
 import ImliReturned from "./ImliReturned"
 import AddLocals from "./AddLocals"
+import LocalsProfile from "./LocalsProfile"
 
 const AdminLayout = () => {
   const [activePage, setActivePage] = useState("dashboard")
@@ -18,6 +19,7 @@ const AdminLayout = () => {
     addRawImli: { component: AddRawImli, title: "ADD RAW IMLI IN STOCKS" },
     assignImli: { component: AssignImli, title: "ASSIGN IMLI" },
     imliReturned: { component: ImliReturned, title: "IMLI RETURNED" },
+    localsProfile: { component: LocalsProfile, title: "LOCALS PROFILE" },
   }
 
   const currentPage = pageConfig[activePage]

@@ -7,6 +7,7 @@ export default function Sidebar({ activePage, onPageChange }) {
     { id: "addRawImli", label: "Add Raw Imli" },
     { id: "assignImli", label: "Assign Imli" },
     { id: "imliReturned", label: "Imli Returned" },
+    { id: "localsProfile", label: "Locals Profile" },
   ]
 
   return (
