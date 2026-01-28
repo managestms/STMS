@@ -36,5 +36,5 @@ const delete_local = asyncHandler(async (req, res) => {
     );
 });
 
-export {return_local};
+export {return_local, delete_local};
 

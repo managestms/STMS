@@ -36,7 +36,10 @@ app.use("/api",assignImli)
 import returnImli from "./route/returnedimli.route.js"
 app.use("/api",returnImli)
 
-import localop from "./route/localop.js"
-app.use("/api",localop)
+import return_local from "./route/local.operation.js"
+app.use("/api",return_local)
+
+import delete_local from "./route/local.operation.js"
+app.use("/api",delete_local)
 
 export {app}
