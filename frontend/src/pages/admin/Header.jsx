@@ -1,13 +1,24 @@
-const Header = ({ title }) => {
+const Header = ({ title, onToggleSidebar, isSidebarCollapsed }) => {
   return (
-    <header className="bg-gray-800 text-white px-8 py-4 flex items-center">
-      <div className="flex items-center ml-60 gap-4 ">
-        <button className="text-white">
+    <header className="bg-gradient-to-r from-orange-400 via-orange-500 to-orange-600 text-white px-6 py-4 flex items-center h-[80px] shadow-lg border-b border-orange-300/30">
+      <div className="flex items-center gap-4 w-full">
+        <button 
+          onClick={onToggleSidebar}
+          className="text-white/90 hover:text-white transition-colors p-2 rounded-lg hover:bg-white/10 active:scale-95 transition-all duration-200"
+          aria-label="Toggle sidebar"
+        >
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+            {isSidebarCollapsed ? (
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 5l7 7-7 7M5 5l7 7-7 7" />
+            ) : (
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 19l-7-7 7-7M5 12h14" />
+            )}
           </svg>
         </button>
-        <h2 className="text-2xl font-bold">{title}</h2>
+        <div className="flex items-center gap-3">
+          <div className="w-2 h-8 bg-white/20 rounded-full"></div>
+          <h2 className="text-xl font-semibold tracking-wide truncate text-white/95">{title}</h2>
+        </div>
       </div>
     </header>
   )

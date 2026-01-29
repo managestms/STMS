@@ -80,7 +80,7 @@ const LocalsProfile = ({ navigateToAssignImli }) => {
 
   if (loading) {
     return (
-      <div className="p-8 bg-gray-100 ml-64 min-h-screen flex items-center justify-center">
+      <div className="p-4 lg:p-8 bg-gray-100 min-h-screen flex items-center justify-center overflow-x-hidden">
         <div className="text-center">
           <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mb-4"></div>
           <div className="text-2xl font-bold text-gray-700">Loading...</div>
@@ -91,14 +91,14 @@ const LocalsProfile = ({ navigateToAssignImli }) => {
 
   if (error) {
     return (
-      <div className="p-8 bg-gray-100 ml-64 min-h-screen flex items-center justify-center">
+      <div className="p-4 lg:p-8 bg-gray-100 min-h-screen flex items-center justify-center overflow-x-hidden">
         <div className="bg-white rounded-lg shadow-lg p-8 max-w-md text-center">
           <div className="text-red-500 text-5xl mb-4">⚠️</div>
           <h3 className="text-2xl font-bold text-gray-900 mb-2">Error</h3>
           <p className="text-gray-600 mb-6">{error}</p>
           <button
             onClick={fetchLocals}
-            className="px-6 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors"
+            className="px-6 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors"
           >
             Try Again
           </button>
@@ -108,13 +108,13 @@ const LocalsProfile = ({ navigateToAssignImli }) => {
   }
 
   return (
-    <div className="p-8 bg-gray-100 ml-64 min-h-screen">
+    <div className="p-4 lg:p-8 bg-gray-100 min-h-screen overflow-x-hidden">
       <div className="mb-8">
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-4 gap-4">
           <h2 className="text-3xl font-bold text-gray-900">Locals Profile</h2>
           <button
             onClick={fetchLocals}
-            className="px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors flex items-center gap-2"
+            className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors flex items-center gap-2 self-start lg:self-auto"
             aria-label="Refresh locals list"
           >
             <svg

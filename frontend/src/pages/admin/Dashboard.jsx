@@ -5,7 +5,8 @@ const Dashboard = () => {
       title: "Raw Imli",
       titleUrdu: "اِمّی الا",
       value: "78045 KG",
-      color: "border-green-600",
+      color: "border-orange-500",
+      textColor: "text-orange-500",
       icon: "🌿",
     },
     {
@@ -13,7 +14,8 @@ const Dashboard = () => {
       title: "Cleaned Imli",
       titleUrdu: "صاف الا",
       value: "78045 KG",
-      color: "border-amber-700",
+      color: "border-orange-600",
+      textColor: "text-orange-600",
       icon: "🫘",
     },
     {
@@ -21,7 +23,8 @@ const Dashboard = () => {
       title: "Distributed Imli to Locals",
       titleUrdu: "مقسم شدہ الا",
       value: "78045 KG",
-      color: "border-orange-600",
+      color: "border-orange-400",
+      textColor: "text-orange-400",
       icon: "📋",
     },
     {
@@ -29,7 +32,8 @@ const Dashboard = () => {
       title: "Pending Imli to be returned",
       titleUrdu: "اِمّی الا",
       value: "78045 KG",
-      color: "border-pink-500",
+      color: "border-orange-700",
+      textColor: "text-orange-700",
       icon: "🔄",
     },
   ]
@@ -62,11 +66,11 @@ const Dashboard = () => {
   ]
 
   return (
-    <div className="p-8 bg-gray-100 ml-60 min-h-screen">
+    <div className="p-4 lg:p-8 bg-gray-100 min-h-screen overflow-x-hidden">
       {/* Stats Cards */}
-      <div className="grid grid-cols-4 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 lg:gap-6 mb-6 lg:mb-8">
         {stats.map((stat) => (
-          <div key={stat.id} className="bg-white rounded-lg p-6 border-l-4" style={{ borderColor: stat.color }}>
+          <div key={stat.id} className={`bg-white rounded-lg p-4 lg:p-6 border-l-4 ${stat.color}`}>
             <div className="flex items-start justify-between mb-4">
               <div>
                 <p className="text-gray-600 text-sm">{stat.title}</p>
@@ -74,7 +78,7 @@ const Dashboard = () => {
               </div>
               <span className="text-3xl">{stat.icon}</span>
             </div>
-            <p className={`text-3xl font-bold mb-2`} style={{ color: stat.color }}>
+            <p className={`text-3xl font-bold mb-2 ${stat.textColor}`}>
               {stat.value}
             </p>
             <p className="text-gray-500 text-xs">Last Updated on 24th October 2025</p>
@@ -83,11 +87,11 @@ const Dashboard = () => {
       </div>
 
       {/* Activities and Quick Actions */}
-      <div className="grid grid-cols-3 w-308 gap-6 mb-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6 mb-6 lg:mb-8">
         {/* Activities */}
-        <div className="col-span-2 bg-white rounded-lg p-6">
+        <div className="lg:col-span-2 bg-white rounded-lg p-4 lg:p-6">
           <h3 className="text-xl font-bold mb-6">RECENT ACTIVITIES</h3>
-          <div className="grid grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 lg:gap-6">
             {activities.map((activity, idx) => (
               <div key={idx} className="border border-gray-300 rounded-lg p-4">
                 <h4 className="font-bold text-sm mb-4">{activity.title}</h4>
@@ -106,21 +110,21 @@ const Dashboard = () => {
         </div>
 
         {/* Quick Actions */}
-        <div className="bg-white rounded-lg p-6">
+        <div className="bg-white rounded-lg p-4 lg:p-6">
           <h3 className="text-xl font-bold mb-6">QUICK ACTIONS</h3>
           <div className="space-y-4">
-            <button className="w-full border-2 border-gray-300 rounded-lg p-6 flex flex-col items-center justify-center hover:bg-gray-50 transition-colors">
+            <button className="w-full border-2 border-orange-300 rounded-lg p-4 lg:p-6 flex flex-col items-center justify-center hover:bg-orange-50 transition-colors">
               <span className="text-4xl mb-2">➕</span>
-              <span className="text-sm font-semibold text-gray-900">Add Raw Imli in Stocks</span>
+              <span className="text-sm font-semibold text-orange-900">Add Raw Imli in Stocks</span>
             </button>
             <div className="grid grid-cols-2 gap-4">
-              <button className="border-2 border-gray-300 rounded-lg p-4 flex flex-col items-center justify-center hover:bg-gray-50 transition-colors">
+              <button className="border-2 border-orange-300 rounded-lg p-4 flex flex-col items-center justify-center hover:bg-orange-50 transition-colors">
                 <span className="text-2xl mb-2">⚙️</span>
-                <span className="text-xs font-semibold text-gray-900">Assign Imli</span>
+                <span className="text-xs font-semibold text-orange-900">Assign Imli</span>
               </button>
-              <button className="border-2 border-gray-300 rounded-lg p-4 flex flex-col items-center justify-center hover:bg-gray-50 transition-colors">
+              <button className="border-2 border-orange-300 rounded-lg p-4 flex flex-col items-center justify-center hover:bg-orange-50 transition-colors">
                 <span className="text-2xl mb-2">📦</span>
-                <span className="text-xs font-semibold text-gray-900">Imli Cleaned</span>
+                <span className="text-xs font-semibold text-orange-900">Imli Cleaned</span>
               </button>
             </div>
           </div>

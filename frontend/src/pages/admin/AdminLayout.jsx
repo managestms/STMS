@@ -13,10 +13,15 @@ import LocalsProfile from "./LocalsProfile"
 const AdminLayout = () => {
   const [activePage, setActivePage] = useState("dashboard")
   const [navigationProps, setNavigationProps] = useState({})
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(true) // Start collapsed
 
   const navigateToAssignImli = (localData) => {
     setNavigationProps({ prefilledLocalId: localData.LocalID, prefilledLocal: localData })
     setActivePage("assignImli")
+  }
+
+  const toggleSidebar = () => {
+    setIsSidebarCollapsed(!isSidebarCollapsed)
   }
 
   const pageConfig = {
@@ -37,10 +42,19 @@ const AdminLayout = () => {
   }
 
   return (
-    <div className="flex h-screen bg-gray-100">
-      <Sidebar activePage={activePage} onPageChange={handlePageChange} />
-      <div className="flex-1 flex flex-col">
-        <Header title={currentPage.title} />
+    <div className="flex h-screen bg-gray-100 overflow-hidden">
+      <Sidebar 
+        activePage={activePage} 
+        onPageChange={handlePageChange} 
+        isCollapsed={isSidebarCollapsed}
+        onToggle={toggleSidebar}
+      />
+      <div className="flex-1 flex flex-col min-w-0">
+        <Header 
+          title={currentPage.title} 
+          onToggleSidebar={toggleSidebar}
+          isSidebarCollapsed={isSidebarCollapsed}
+        />
         <div className="flex-1 overflow-auto">
           <CurrentComponent {...currentPage.props} />
         </div>
