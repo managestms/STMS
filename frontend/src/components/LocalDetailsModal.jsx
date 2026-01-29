@@ -34,9 +34,9 @@ const LocalDetailsModal = ({ isOpen, onClose, local, onDelete }) => {
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto">
-      {/* Backdrop overlay */}
+      {/* Backdrop overlay with blur effect */}
       <div 
-        className="fixed inset-0 bg-black bg-opacity-20 transition-opacity duration-300"
+        className="fixed inset-0 bg-white/30 backdrop-blur-sm transition-all duration-300"
         onClick={onClose}
       />
       

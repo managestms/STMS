@@ -3,7 +3,7 @@ import axios from "../../api/axios"
 import { IoEye, IoPencil, IoAdd } from "react-icons/io5"
 import LocalDetailsModal from "../../components/LocalDetailsModal"
 
-const LocalsProfile = () => {
+const LocalsProfile = ({ navigateToAssignImli }) => {
   const [locals, setLocals] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
@@ -133,14 +133,26 @@ const LocalsProfile = () => {
             Refresh
           </button>
         </div>
-        <input
-          type="text"
-          placeholder="Search by name, phone, or ID..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          aria-label="Search locals by name, phone, or ID"
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900"
-        />
+        
+        {/* Search Bar with Count */}
+        <div className="flex items-center justify-between bg-gray-100 px-4 py-3 mb-4 border border-gray-200 rounded-lg">
+          <div className="flex items-center flex-1">
+            <svg className="w-5 h-5 text-gray-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+            <input
+              type="text"
+              placeholder="Search by name, phone, or ID..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              aria-label="Search locals by name, phone, or ID"
+              className="flex-1 border-none outline-none text-gray-900 placeholder-gray-400 bg-transparent"
+            />
+          </div>
+          <div className="text-sm text-gray-500 font-medium">
+            {filteredLocals.length} locals
+          </div>
+        </div>
       </div>
 
       {filteredLocals.length === 0 ? (
@@ -159,83 +171,79 @@ const LocalsProfile = () => {
           )}
         </div>
       ) : (
-        <div className="bg-white rounded-lg shadow-md overflow-hidden">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    ID
+            <table className="min-w-full">
+              <thead>
+                <tr className="bg-gray-50/80 border-b border-gray-200">
+                  <th className="px-8 py-5 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    Local
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Name
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Phone
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Address
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-8 py-5 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                     Assigned Qty
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-4 py-5 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                     Status
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-4 py-5 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider pr-44">
                     Actions
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="bg-white divide-y divide-gray-100">
                 {filteredLocals.map((local, index) => (
-                  <tr key={local._id} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                      {local.LocalID}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-gray-900">
-                        {local.LocalName || "Unnamed Local"}
+                  <tr key={local._id} className="hover:bg-gray-50/50 transition-all duration-200 group">
+                    <td className="px-8 py-6">
+                      <div className="flex items-center space-x-4">
+                        <div className="flex-shrink-0">
+                          <div className="h-12 w-12 rounded-full bg-gradient-to-br from-blue-500 via-blue-600 to-indigo-600 flex items-center justify-center shadow-lg">
+                            <span className="text-sm font-semibold text-white">
+                              {(local.LocalName || "U").charAt(0).toUpperCase()}
+                            </span>
+                          </div>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="text-sm font-semibold text-gray-900 mb-1">
+                            {local.LocalName || "Unnamed Local"}
+                          </div>
+                          <div className="text-sm text-gray-500 font-medium">
+                            ID: {local.LocalID}
+                          </div>
+                        </div>
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {local.LocalPhone || "N/A"}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-500 max-w-xs truncate">
-                      <div title={local.LocalAddress || "N/A"}>
-                        {local.LocalAddress || "N/A"}
+                    <td className="px-8 py-6">
+                      <div className="flex items-center">
+                        <span className="text-lg font-bold text-gray-900 mr-1">
+                          {local.totalAssignedQuantity || 0}
+                        </span>
+                        <span className="text-sm text-gray-500 font-medium">kg</span>
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      <span className="font-medium">{local.totalAssignedQuantity || 0}</span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
+                    <td className="px-4 py-6">
+                      <span className="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800 border border-emerald-200">
+                        <svg className="w-2.5 h-2.5 mr-1.5" fill="currentColor" viewBox="0 0 8 8">
+                          <circle cx="4" cy="4" r="3"/>
+                        </svg>
                         Active
                       </span>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <div className="flex items-center justify-end space-x-3">
+                    <td className="px-4 py-6 text-right pr-8">
+                      <div className="flex items-center justify-end space-x-3 mr-4">
                         <button 
                           onClick={() => openModal(local)}
-                          className="inline-flex items-center px-3 py-1 border border-gray-300 rounded-md text-xs font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors"
+                          className="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200 shadow-sm hover:shadow-md"
                           title="View Details"
                         >
-                          <IoEye className="w-3 h-3 mr-1" />
+                          <IoEye className="w-4 h-4 mr-2" />
                           View
                         </button>
                         <button 
-                          className="inline-flex items-center px-3 py-1 border border-yellow-300 rounded-md text-xs font-medium text-yellow-700 bg-yellow-50 hover:bg-yellow-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 transition-colors"
-                          title="Edit Local"
-                        >
-                          <IoPencil className="w-3 h-3 mr-1" />
-                          Edit
-                        </button>
-                        <button 
-                          className="inline-flex items-center px-3 py-1 border border-blue-300 rounded-md text-xs font-medium text-blue-700 bg-blue-50 hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+                          onClick={() => navigateToAssignImli && navigateToAssignImli(local)}
+                          className="inline-flex items-center px-3 py-2 text-sm font-medium text-blue-700 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100 hover:text-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200 shadow-sm hover:shadow-md"
                           title="Assign Imli"
                         >
-                          <IoAdd className="w-3 h-3 mr-1" />
+                          <IoAdd className="w-4 h-4 mr-2" />
                           Assign
                         </button>
                       </div>

@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import api from "../../api/axios"
 import toast from "react-hot-toast"
 
-const AssignImli = () => {
+const AssignImli = ({ prefilledLocalId, prefilledLocal }) => {
   const [formData, setFormData] = useState({
     LocalID: "",
     assignedQuantity: "",
@@ -36,6 +36,19 @@ const AssignImli = () => {
 
     fetchLocals()
   }, [])
+
+  // Handle prefilled local data
+  useEffect(() => {
+    if (prefilledLocal && prefilledLocalId) {
+      setSelectedLocal(prefilledLocal)
+      setFormData({
+        LocalID: `${prefilledLocal.LocalID} - ${prefilledLocal.LocalName}`,
+        assignedQuantity: "",
+      })
+      setShowDropdown(false)
+      setFilteredLocals([])
+    }
+  }, [prefilledLocal, prefilledLocalId])
 
   // Handle search input change
   const handleSearchChange = (e) => {
