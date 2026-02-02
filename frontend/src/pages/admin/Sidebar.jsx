@@ -25,25 +25,24 @@ export default function Sidebar({ activePage, onPageChange, isCollapsed, onToggl
   ]
 
   return (
-    <aside className={`${isCollapsed ? 'w-16' : 'w-64'} bg-gradient-to-b from-white to-gray-50 h-screen flex flex-col flex-shrink-0 shadow-xl transition-all duration-300 ease-in-out relative overflow-hidden`}>
-      {/* Header - ChatGPT Style */}
-      <div className="px-3 py-4 bg-[#ff741f] h-[64px] flex items-center justify-between shadow-lg relative overflow-hidden transition-all duration-300">
-        <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent"></div>
+    <aside className={`${isCollapsed ? 'w-16' : 'w-64'} bg-white h-screen flex flex-col flex-shrink-0 border-r border-gray-200 transition-all duration-300 ease-in-out relative z-30`}>
+      {/* Header */}
+      <div className="bg-[#ff741f] h-[64px] flex items-center justify-between relative transition-all duration-300">
 
-        {/* Logo */}
-        <div className="relative z-10 flex items-center">
+        {/* Logo & Toggle */}
+        <div className={`relative z-10 flex items-center h-full ${isCollapsed ? 'w-full justify-center' : 'w-full justify-between px-4'}`}>
           {isCollapsed ? (
             /* When collapsed: Logo with hover-to-toggle behavior */
             <button
               onClick={onToggle}
-              className="group flex items-center gap-2 transition-all duration-300 cursor-pointer"
+              className="group flex items-center justify-center transition-all duration-300 cursor-pointer w-10 h-10"
             >
-              <div className="w-10 h-10 flex items-center justify-center rounded-lg group-hover:bg-white/20 transition-all duration-300">
+              <div className="w-10 h-10 flex items-center justify-center rounded-lg group-hover:bg-white/20 transition-all duration-300 relative">
                 {/* Logo - visible by default, hidden on hover */}
                 <img
                   src="/stms-logo.svg"
                   alt="SITMS Portal"
-                  className="h-40 w-auto filter brightness-0 invert absolute transition-all duration-300 opacity-100 group-hover:opacity-0 group-hover:scale-75"
+                  className="h-8 w-auto filter brightness-0 invert absolute transition-all duration-300 opacity-100 group-hover:opacity-0 group-hover:scale-75"
                 />
                 {/* Sidebar Panel Icon - hidden by default, visible on hover */}
                 <svg
@@ -58,59 +57,61 @@ export default function Sidebar({ activePage, onPageChange, isCollapsed, onToggl
               </div>
             </button>
           ) : (
-            /* When expanded: Just show the logo */
-            <div className="w-10 h-10 flex items-center justify-center rounded-lg">
-              <img
-                src="/stms-logo.svg"
-                alt="SITMS Portal"
-                className="h-12 w-auto filter brightness-0 invert"
-              />
-            </div>
+            /* When expanded: Just show the logo and toggle button separately */
+            <>
+              <div className="flex items-center justify-center rounded-lg">
+                <img
+                  src="/stms-logo.svg"
+                  alt="SITMS Portal"
+                  className="h-8 w-auto filter brightness-0 invert"
+                />
+              </div>
+              <button
+                onClick={onToggle}
+                className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white/20 transition-all duration-200 group"
+                aria-label="Close sidebar"
+              >
+                <svg
+                  className="w-5 h-5 text-white/80 group-hover:text-white transition-colors"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <rect x="3" y="3" width="18" height="18" rx="2" strokeWidth="2" />
+                  <line x1="9" y1="3" x2="9" y2="21" strokeWidth="2" />
+                </svg>
+              </button>
+            </>
           )}
         </div>
-
-        {/* Toggle Button - Only visible when expanded (like ChatGPT) */}
-        {!isCollapsed && (
-          <button
-            onClick={onToggle}
-            className="relative z-10 w-9 h-9 flex items-center justify-center rounded-lg hover:bg-white/20 transition-all duration-200 group"
-            aria-label="Close sidebar"
-          >
-            <svg
-              className="w-5 h-5 text-white/80 group-hover:text-white transition-colors"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <rect x="3" y="3" width="18" height="18" rx="2" strokeWidth="2" />
-              <line x1="9" y1="3" x2="9" y2="21" strokeWidth="2" />
-            </svg>
-          </button>
-        )}
       </div>
 
       {/* Menu Items */}
-      <nav className={`flex-1 ${isCollapsed ? 'px-1' : 'px-3'} py-6 space-y-1 transition-all duration-300`}>
+      <nav className={`flex-1 ${isCollapsed ? 'px-2' : 'px-3'} py-6 space-y-1 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:none]`}>
         {menuItems.map((item) => {
           const IconComponent = item.icon;
+          const isActive = activePage === item.id;
           return (
             <div key={item.id} className="relative group">
               <button
                 onClick={() => onPageChange(item.id)}
-                className={`w-full ${isCollapsed ? 'px-0 py-3 justify-center' : 'px-4 py-3.5 justify-start'} font-medium transition-all duration-200 group flex items-center gap-3 relative ${activePage === item.id
-                  ? "bg-orange-50 text-[#ff741f] border-l-4 border-[#ff741f] rounded-r-xl"
-                  : "text-gray-700 hover:bg-orange-50 hover:text-orange-700 hover:shadow-sm rounded-xl"
+                className={`w-full ${isCollapsed ? 'px-0 py-3 justify-center' : 'px-4 py-3 justify-start'} font-medium transition-all duration-200 flex items-center gap-3 relative rounded-lg mb-1 ${isActive
+                  ? "text-orange-600"
+                  : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
                   }`}
               >
-                <IconComponent className="text-xl flex-shrink-0" />
+                {isActive && !isCollapsed && (
+                  <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-orange-600 rounded-r-full"></div>
+                )}
+                <IconComponent className={`text-xl flex-shrink-0 ${isActive ? 'text-orange-600' : 'text-gray-500 group-hover:text-gray-700'}`} />
                 <span className={`whitespace-nowrap transition-all duration-300 ${isCollapsed ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100 w-auto'}`}>
                   {item.label}
                 </span>
               </button>
               {isCollapsed && (
-                <div className="absolute left-full top-1/2 transform -translate-y-1/2 ml-2 px-3 py-2 bg-gray-800 text-white text-sm rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50">
+                <div className="absolute left-full top-1/2 transform -translate-y-1/2 ml-2 px-3 py-2 bg-gray-900 text-white text-xs font-medium rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50 shadow-md">
                   {item.label}
-                  <div className="absolute right-full top-1/2 transform -translate-y-1/2 border-4 border-transparent border-r-gray-800"></div>
+                  <div className="absolute right-full top-1/2 transform -translate-y-1/2 border-4 border-transparent border-r-gray-900"></div>
                 </div>
               )}
             </div>
@@ -119,20 +120,21 @@ export default function Sidebar({ activePage, onPageChange, isCollapsed, onToggl
       </nav>
 
       {/* Settings */}
-      <div className={`border-t border-gray-200/50 ${isCollapsed ? 'p-1' : 'p-3'} bg-gradient-to-r from-gray-50 to-gray-100 transition-all duration-300`}>
+      <div className={`border-t border-gray-100 ${isCollapsed ? 'p-2' : 'p-4'} bg-gray-50`}>
         <div className="relative group">
-          <button className={`w-full flex items-center ${isCollapsed ? 'justify-center px-0 py-3' : 'gap-3 px-4 py-3.5'} rounded-xl text-gray-700 font-medium hover:bg-orange-50 hover:text-[#ff741f] transition-all duration-200 group hover:shadow-sm`}>
-            <div className="w-8 h-8 bg-gradient-to-br from-gray-200 to-gray-300 rounded-lg flex items-center justify-center group-hover:from-orange-200 group-hover:to-orange-300 transition-all duration-200 flex-shrink-0">
-              <MdSettings className="w-4 h-4 text-gray-600 group-hover:text-[#ff741f] transition-colors" />
+          <button className={`w-full flex items-center ${isCollapsed ? 'justify-center py-2' : 'gap-3 px-3 py-2'} rounded-lg text-gray-600 font-medium hover:bg-white hover:shadow-sm transition-all duration-200`}>
+            <div className={`w-8 h-8 bg-gray-200 rounded-lg flex items-center justify-center flex-shrink-0`}>
+              <MdSettings className="w-5 h-5 text-gray-500" />
             </div>
-            <p className={`font-medium whitespace-nowrap transition-all duration-300 ${isCollapsed ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100 w-auto'}`}>
+            <p className={`font-medium whitespace-nowrap transition-all duration-300 text-sm ${isCollapsed ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100 w-auto ml-2'}`}>
               Settings
             </p>
           </button>
+
           {isCollapsed && (
-            <div className="absolute left-full top-1/2 transform -translate-y-1/2 ml-2 px-3 py-2 bg-gray-800 text-white text-sm rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50">
+            <div className="absolute left-full top-1/2 transform -translate-y-1/2 ml-2 px-3 py-2 bg-gray-900 text-white text-xs font-medium rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50 shadow-md">
               Settings
-              <div className="absolute right-full top-1/2 transform -translate-y-1/2 border-4 border-transparent border-r-gray-800"></div>
+              <div className="absolute right-full top-1/2 transform -translate-y-1/2 border-4 border-transparent border-r-gray-900"></div>
             </div>
           )}
         </div>

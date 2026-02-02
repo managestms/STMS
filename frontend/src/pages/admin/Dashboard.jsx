@@ -15,10 +15,9 @@ const Dashboard = ({ navigateToAssignImli, onPageChange }) => {
       title: "Raw Imli",
       titleUrdu: "اِمّی الا",
       value: "78045 KG",
-      color: "border-l-4 border-orange-500",
-      bgGradient: "bg-gradient-to-br from-orange-50 to-orange-100",
-      textColor: "text-orange-600",
-      iconBg: "bg-orange-500",
+      borderColor: "border-orange-500",
+      iconColor: "text-orange-600",
+      iconBg: "bg-orange-50",
       icon: MdEco,
     },
     {
@@ -26,10 +25,9 @@ const Dashboard = ({ navigateToAssignImli, onPageChange }) => {
       title: "Cleaned Imli",
       titleUrdu: "صاف الا",
       value: "78045 KG",
-      color: "border-l-4 border-green-500",
-      bgGradient: "bg-gradient-to-br from-green-50 to-green-100",
-      textColor: "text-green-600",
-      iconBg: "bg-green-500",
+      borderColor: "border-green-500",
+      iconColor: "text-green-600",
+      iconBg: "bg-green-50",
       icon: MdCleaningServices,
     },
     {
@@ -37,10 +35,9 @@ const Dashboard = ({ navigateToAssignImli, onPageChange }) => {
       title: "Distributed Imli to Locals",
       titleUrdu: "مقسم شدہ الا",
       value: "78045 KG",
-      color: "border-l-4 border-blue-500",
-      bgGradient: "bg-gradient-to-br from-blue-50 to-blue-100",
-      textColor: "text-blue-600",
-      iconBg: "bg-blue-500",
+      borderColor: "border-blue-500",
+      iconColor: "text-blue-600",
+      iconBg: "bg-blue-50",
       icon: MdAssignment,
     },
     {
@@ -48,10 +45,9 @@ const Dashboard = ({ navigateToAssignImli, onPageChange }) => {
       title: "Pending Imli to be returned",
       titleUrdu: "اِمّی الا",
       value: "78045 KG",
-      color: "border-l-4 border-purple-500",
-      bgGradient: "bg-gradient-to-br from-purple-50 to-purple-100",
-      textColor: "text-purple-600",
-      iconBg: "bg-purple-500",
+      borderColor: "border-purple-500",
+      iconColor: "text-purple-600",
+      iconBg: "bg-purple-50",
       icon: MdPendingActions,
     },
   ];
@@ -84,7 +80,7 @@ const Dashboard = ({ navigateToAssignImli, onPageChange }) => {
   ];
 
   return (
-    <div className="p-6 lg:p-8 bg-gradient-to-br from-gray-50 via-gray-100 to-gray-200 min-h-screen overflow-x-hidden">
+    <div className="p-6 lg:p-8 bg-gray-50 min-h-screen overflow-x-hidden">
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
         {stats.map((stat) => {
@@ -92,34 +88,34 @@ const Dashboard = ({ navigateToAssignImli, onPageChange }) => {
           return (
             <div
               key={stat.id}
-              className={`bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 ${stat.color} ${stat.bgGradient} border border-white/50 backdrop-blur-sm`}
+              className={`bg-white rounded-xl p-6 shadow-sm border border-gray-100 border-l-4 ${stat.borderColor} hover:shadow-md transition-shadow duration-300`}
             >
-              <div className="flex items-start justify-between mb-6">
+              <div className="flex items-start justify-between mb-4">
                 <div className="flex-1">
-                  <p className="text-gray-700 font-semibold text-sm mb-1">
+                  <p className="text-gray-500 font-medium text-sm mb-1">
                     {stat.title}
                   </p>
-
-                  {/* ✅ Urdu Nastaliq Bold */}
-                  <p className="urdu-ui text-gray-500 text-xl font-bold">
+                  <p className="urdu-ui text-gray-400 text-lg font-bold mb-1">
                     {stat.titleUrdu}
                   </p>
                 </div>
-
-                <div className={`${stat.iconBg} p-3 rounded-xl shadow-md`}>
-                  <IconComponent className="text-2xl text-white" />
+                <div className={`${stat.iconBg} p-2.5 rounded-lg`}>
+                  <IconComponent className={`text-xl ${stat.iconColor}`} />
                 </div>
               </div>
 
-              <p className={`text-4xl font-bold mb-3 ${stat.textColor}`}>
-                {stat.value}
-              </p>
-
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                <p className="text-gray-600 text-xs font-medium">
-                  Last Updated on 24th October 2025
-                </p>
+              <div className="flex items-end justify-between">
+                <div>
+                  <h3 className="text-2xl font-bold text-gray-900">
+                    {stat.value}
+                  </h3>
+                  <div className="flex items-center gap-2 mt-2">
+                    <div className="w-1.5 h-1.5 bg-green-500 rounded-full"></div>
+                    <p className="text-gray-400 text-xs font-medium">
+                      Updated: 24 Oct 2025
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
           );
@@ -129,93 +125,80 @@ const Dashboard = ({ navigateToAssignImli, onPageChange }) => {
       {/* Activities and Quick Actions */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
         {/* Activities */}
-        <div className="lg:col-span-2 bg-white rounded-2xl p-6 shadow-lg border border-gray-200/50">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-1 h-8 bg-gradient-to-b from-orange-500 to-orange-600 rounded-full"></div>
-            <h3 className="text-2xl font-bold text-gray-800">
-              RECENT ACTIVITIES
+        <div className="lg:col-span-2 bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-lg font-bold text-gray-900">
+              Recent Activities
             </h3>
+            <button className="text-orange-600 text-sm font-semibold hover:text-orange-700">
+              View All
+            </button>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {activities.map((activity, idx) => (
               <div
                 key={idx}
-                className="bg-gradient-to-br from-gray-50 to-gray-100 border border-gray-200 rounded-xl p-5 hover:shadow-md transition-all duration-300"
+                className="bg-gray-50 rounded-lg p-4 border border-gray-100"
               >
-                <h4 className="font-bold text-sm mb-4 text-gray-800 pb-2 border-b border-gray-300">
+                <h4 className="font-bold text-xs text-gray-500 uppercase tracking-wider mb-4 border-b border-gray-200 pb-2">
                   {activity.title}
                 </h4>
 
-                <div className="space-y-4">
+                <div className="space-y-3">
                   {activity.items.map((item, itemIdx) => (
                     <div
                       key={itemIdx}
-                      className="bg-white p-3 rounded-lg border border-gray-100 hover:border-gray-200 transition-colors"
+                      className="bg-white p-3 rounded border border-gray-200 shadow-sm"
                     >
-                      <p className="text-gray-700 text-sm font-semibold mb-2 leading-relaxed">
+                      <p className="text-gray-800 text-xs font-semibold leading-relaxed mb-1">
                         {item.description}
                       </p>
-                      <p className="text-gray-500 text-xs font-medium">
+                      <p className="text-gray-400 text-[10px] font-medium">
                         {item.date}
                       </p>
                     </div>
                   ))}
                 </div>
-
-                <button className="text-orange-600 font-bold text-xs mt-4 hover:text-orange-700 transition-colors flex items-center gap-1">
-                  SEE ALL <span className="text-xs">→</span>
-                </button>
               </div>
             ))}
           </div>
         </div>
 
         {/* Quick Actions */}
-        <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-200/50">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-1 h-8 bg-gradient-to-b from-blue-500 to-blue-600 rounded-full"></div>
-            <h3 className="text-2xl font-bold text-gray-800">
-              QUICK ACTIONS
-            </h3>
-          </div>
+        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+          <h3 className="text-lg font-bold text-gray-900 mb-6">
+            Quick Actions
+          </h3>
 
-          <div className="space-y-4">
+          <div className="space-y-3">
             <button
               onClick={() => onPageChange && onPageChange('addRawImli')}
-              className="w-full bg-gradient-to-br from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 rounded-xl p-6 flex flex-col items-center justify-center text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
+              className="w-full bg-orange-600 hover:bg-orange-700 text-white rounded-lg p-4 flex items-center justify-center gap-3 transition-colors shadow-sm"
             >
-              <div className="bg-white/20 p-3 rounded-xl mb-3">
-                <MdAdd className="text-3xl" />
-              </div>
-              <span className="text-sm font-semibold">
-                Add Raw Imli in Stocks
-              </span>
+              <MdAdd className="text-xl" />
+              <span className="font-semibold text-sm">Add Raw Imli Stock</span>
             </button>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-3">
               <button
                 onClick={() => onPageChange && onPageChange('assignImli')}
-                className="bg-gradient-to-br from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 rounded-xl p-5 flex flex-col items-center justify-center text-white shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1"
+                className="bg-white border border-gray-200 hover:bg-gray-50 hover:border-gray-300 text-gray-700 rounded-lg p-4 flex flex-col items-center justify-center gap-2 transition-all shadow-sm group"
               >
-                <div className="bg-white/20 p-2 rounded-lg mb-2">
-                  <MdSettings className="text-xl" />
+                <div className="bg-purple-50 p-2 rounded-lg group-hover:bg-purple-100 transition-colors">
+                  <MdSettings className="text-purple-600 text-lg" />
                 </div>
-                <span className="text-xs font-semibold text-center leading-tight">
-                  Assign Imli
-                </span>
+                <span className="text-xs font-semibold">Assign Imli</span>
               </button>
 
               <button
                 onClick={() => onPageChange && onPageChange('imliReturned')}
-                className="bg-gradient-to-br from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 rounded-xl p-5 flex flex-col items-center justify-center text-white shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1"
+                className="bg-white border border-gray-200 hover:bg-gray-50 hover:border-gray-300 text-gray-700 rounded-lg p-4 flex flex-col items-center justify-center gap-2 transition-all shadow-sm group"
               >
-                <div className="bg-white/20 p-2 rounded-lg mb-2">
-                  <MdInventory className="text-xl" />
+                <div className="bg-green-50 p-2 rounded-lg group-hover:bg-green-100 transition-colors">
+                  <MdInventory className="text-green-600 text-lg" />
                 </div>
-                <span className="text-xs font-semibold text-center leading-tight">
-                  Imli Cleaned
-                </span>
+                <span className="text-xs font-semibold">Imli Cleaned</span>
               </button>
             </div>
           </div>

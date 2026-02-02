@@ -81,9 +81,9 @@ const LocalsProfile = ({ navigateToAssignImli }) => {
 
   if (loading) {
     return (
-      <div className="p-6 lg:p-8 bg-gradient-to-br from-gray-50 via-gray-100 to-gray-200 min-h-screen flex items-center justify-center overflow-x-hidden">
+      <div className="p-6 lg:p-8 bg-white min-h-screen flex items-center justify-center overflow-x-hidden">
         <div className="text-center">
-          <div className="bg-orange-100 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
+          <div className="bg-orange-50 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6 shadow-sm border border-orange-200">
             <div className="w-12 h-12 border-4 border-orange-500 border-t-transparent rounded-full animate-spin"></div>
           </div>
           <div className="text-2xl font-bold text-gray-800 mb-2">Loading Locals...</div>
@@ -95,16 +95,16 @@ const LocalsProfile = ({ navigateToAssignImli }) => {
 
   if (error) {
     return (
-      <div className="p-6 lg:p-8 bg-gradient-to-br from-gray-50 via-gray-100 to-gray-200 min-h-screen flex items-center justify-center overflow-x-hidden">
-        <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-md text-center border border-gray-200/50">
-          <div className="bg-red-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6">
+      <div className="p-6 lg:p-8 bg-white min-h-screen flex items-center justify-center overflow-x-hidden">
+        <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md text-center border border-orange-200">
+          <div className="bg-red-50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6">
             <MdError className="text-3xl text-red-600" />
           </div>
           <h3 className="text-2xl font-bold text-gray-900 mb-3">Error Loading Data</h3>
           <p className="text-gray-600 mb-8 leading-relaxed">{error}</p>
           <button
             onClick={fetchLocals}
-            className="px-8 py-3 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-xl font-semibold hover:from-orange-600 hover:to-orange-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center justify-center gap-2 mx-auto"
+            className="px-8 py-3 bg-orange-500 text-white rounded-lg font-semibold hover:bg-orange-600 transition-all duration-200 shadow-sm flex items-center justify-center gap-2 mx-auto"
           >
             <MdRefresh className="text-lg" />
             Try Again
@@ -115,12 +115,12 @@ const LocalsProfile = ({ navigateToAssignImli }) => {
   }
 
   return (
-    <div className="p-6 lg:p-8 bg-gradient-to-br from-gray-50 via-gray-100 to-gray-200 min-h-screen overflow-x-hidden">
+    <div className="p-6 lg:p-8 bg-white min-h-screen overflow-x-hidden">
       <div className="mb-8">
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-6 gap-4">
           <div className="flex items-center gap-4">
-            <div className="bg-white/80 backdrop-blur-sm p-3 rounded-xl shadow-sm border border-gray-200/50">
-              <MdPeople className="text-3xl text-gray-700" />
+            <div className="bg-white p-3 rounded-lg shadow-sm border border-orange-500/30">
+              <MdPeople className="text-3xl text-orange-600" />
             </div>
             <div>
               <h2 className="text-4xl font-bold text-gray-900">Locals Profile</h2>
@@ -129,20 +129,20 @@ const LocalsProfile = ({ navigateToAssignImli }) => {
           </div>
           <button
             onClick={fetchLocals}
-            className="px-6 py-3 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-xl hover:from-orange-600 hover:to-orange-700 transition-all duration-200 flex items-center gap-2 self-start lg:self-auto shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 font-semibold"
+            className="px-6 py-2.5 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-all duration-200 flex items-center gap-2 self-start lg:self-auto shadow-sm font-medium border border-orange-600"
             aria-label="Refresh locals list"
           >
             <MdRefresh className="text-lg" />
             Refresh
           </button>
         </div>
-        
+
         {/* Search Bar with Count */}
-        <div className="bg-white/80 backdrop-blur-sm rounded-2xl border border-gray-200/50 shadow-lg p-6 mb-6">
+        <div className="bg-white rounded-xl border border-orange-500/20 shadow-sm p-4 mb-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center flex-1 mr-6">
-              <div className="bg-blue-100 p-3 rounded-xl mr-4">
-                <MdSearch className="text-blue-600 text-xl" />
+              <div className="bg-orange-50 p-2.5 rounded-lg mr-4 border border-orange-100">
+                <MdSearch className="text-orange-600 text-xl" />
               </div>
               <input
                 type="text"
@@ -150,12 +150,12 @@ const LocalsProfile = ({ navigateToAssignImli }) => {
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 aria-label="Search locals by name, phone, or ID"
-                className="flex-1 border-none outline-none text-gray-900 placeholder-gray-400 bg-transparent text-lg font-medium"
+                className="flex-1 border-none outline-none text-gray-900 placeholder-gray-400 bg-transparent text-base font-medium"
               />
             </div>
-            <div className="bg-gray-100 px-4 py-2 rounded-xl">
-              <div className="text-sm text-gray-600 font-medium">
-                <span className="font-bold text-gray-900">{filteredLocals.length}</span> locals
+            <div className="bg-orange-50 px-4 py-2 rounded-lg border border-orange-100">
+              <div className="text-sm text-gray-700 font-medium">
+                <span className="font-bold text-orange-600">{filteredLocals.length}</span> locals
               </div>
             </div>
           </div>
@@ -163,9 +163,9 @@ const LocalsProfile = ({ navigateToAssignImli }) => {
       </div>
 
       {filteredLocals.length === 0 ? (
-        <div className="bg-white rounded-2xl p-12 text-center shadow-lg border border-gray-200/50">
-          <div className="bg-gray-100 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
-            <MdSearch className="text-4xl text-gray-400" />
+        <div className="bg-white rounded-xl p-12 text-center shadow-sm border border-orange-500/20">
+          <div className="bg-gray-50 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
+            <MdSearch className="text-4xl text-gray-300" />
           </div>
           <h3 className="text-2xl font-bold text-gray-900 mb-3">
             {searchTerm ? "No matching locals found" : "No locals available"}
@@ -176,89 +176,76 @@ const LocalsProfile = ({ navigateToAssignImli }) => {
           {searchTerm ? (
             <button
               onClick={() => setSearchTerm("")}
-              className="px-6 py-3 bg-gradient-to-r from-gray-100 to-gray-200 text-gray-700 border-2 border-gray-300 rounded-xl hover:from-gray-200 hover:to-gray-300 hover:border-gray-400 transition-all duration-200 font-semibold shadow-sm hover:shadow-md transform hover:-translate-y-0.5"
+              className="px-6 py-2.5 bg-white text-orange-600 border border-orange-500 rounded-lg hover:bg-orange-50 transition-all duration-200 font-medium shadow-sm"
             >
               Clear Search
             </button>
           ) : (
-            <button className="px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl hover:from-blue-600 hover:to-blue-700 transition-all duration-200 font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center gap-2 mx-auto">
+            <button className="px-6 py-3 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-all duration-200 font-medium shadow-sm flex items-center gap-2 mx-auto">
               <MdPersonAdd className="text-lg" />
               Add New Local
             </button>
           )}
         </div>
       ) : (
-        <div className="bg-white rounded-2xl shadow-lg border border-gray-200/50 overflow-hidden">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
           <div className="overflow-x-auto">
             <table className="min-w-full">
               <thead>
-                <tr className="bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200">
-                  <th className="px-8 py-6 text-left text-sm font-bold text-gray-700 uppercase tracking-wider">
+                <tr className="bg-gray-50 border-b border-gray-200">
+                  <th className="px-6 py-5 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                     Local
                   </th>
-                  <th className="px-8 py-6 text-left text-sm font-bold text-gray-700 uppercase tracking-wider">
-                    Assigned Qty
-                  </th>
-                  <th className="px-4 py-6 text-left text-sm font-bold text-gray-700 uppercase tracking-wider">
+                  <th className="px-4 py-5 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider whitespace-nowrap">
                     Status
                   </th>
-                  <th className="px-4 py-6 text-right text-sm font-bold text-gray-700 uppercase tracking-wider pr-8">
+                  <th className="px-4 py-5 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider pr-6 whitespace-nowrap">
                     Actions
                   </th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-100">
                 {filteredLocals.map((local, index) => (
-                  <tr key={local._id} className="hover:bg-gradient-to-r hover:from-gray-50 hover:to-gray-100 transition-all duration-200 group">
-                    <td className="px-8 py-6">
+                  <tr key={local._id} className="hover:bg-orange-50/30 transition-all duration-200 group">
+                    <td className="px-6 py-5">
                       <div className="flex items-center space-x-4">
                         <div className="flex-shrink-0">
-                          <div className="h-14 w-14 rounded-full bg-gradient-to-br from-blue-500 via-blue-600 to-indigo-600 flex items-center justify-center shadow-lg ring-4 ring-blue-50">
-                            <span className="text-lg font-bold text-white">
-                              {(local.LocalName || "U").charAt(0).toUpperCase()}
-                            </span>
+                          <div className="h-12 w-12 rounded-full border border-orange-200 bg-orange-50 flex items-center justify-center text-orange-600 font-bold text-lg">
+                            {(local.LocalName || "U").charAt(0).toUpperCase()}
                           </div>
                         </div>
                         <div className="flex-1 min-w-0">
-                          <div className="text-lg font-bold text-gray-900 mb-1">
+                          <div className="text-base font-bold text-gray-900 mb-0.5">
                             {local.LocalName || "Unnamed Local"}
                           </div>
-                          <div className="text-sm text-gray-600 font-medium flex items-center gap-1">
+                          <div className="text-sm text-gray-500 flex items-center gap-1">
                             <span>ID:</span>
-                            <span className="bg-gray-100 px-2 py-1 rounded-md text-xs font-semibold text-gray-700">
+                            <span className="bg-gray-100 px-1.5 py-0.5 rounded text-xs font-medium text-gray-600">
                               {local.LocalID}
                             </span>
                           </div>
                         </div>
                       </div>
                     </td>
-                    <td className="px-8 py-6">
-                      <div className="flex items-center">
-                        <span className="text-2xl font-bold text-gray-900 mr-2">
-                          {local.totalAssignedQuantity || 0}
-                        </span>
-                        <span className="text-sm text-gray-500 font-semibold bg-gray-100 px-2 py-1 rounded-md">KG</span>
-                      </div>
-                    </td>
-                    <td className="px-4 py-6">
-                      <span className="inline-flex items-center px-4 py-2 rounded-xl text-sm font-bold bg-gradient-to-r from-green-100 to-green-200 text-green-800 border border-green-300 shadow-sm">
-                        <div className="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></div>
+                    <td className="px-4 py-5">
+                      <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-green-50 text-green-700 border border-green-200">
+                        <div className="w-1.5 h-1.5 bg-green-500 rounded-full mr-1.5"></div>
                         Active
                       </span>
                     </td>
-                    <td className="px-4 py-6 text-right pr-8">
+                    <td className="px-4 py-5 text-right pr-6">
                       <div className="flex items-center justify-end space-x-3">
-                        <button 
+                        <button
                           onClick={() => openModal(local)}
-                          className="inline-flex items-center px-4 py-2.5 text-sm font-semibold text-gray-700 bg-white border-2 border-gray-300 rounded-xl hover:bg-gray-50 hover:text-gray-900 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200 shadow-sm hover:shadow-md transform hover:-translate-y-0.5"
+                          className="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-600 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 hover:text-gray-900 hover:border-gray-400 focus:outline-none transition-all duration-200 shadow-sm"
                           title="View Details"
                         >
                           <MdVisibility className="w-4 h-4 mr-2" />
                           View
                         </button>
-                        <button 
+                        <button
                           onClick={() => navigateToAssignImli && navigateToAssignImli(local)}
-                          className="inline-flex items-center px-4 py-2.5 text-sm font-semibold text-white bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl hover:from-blue-600 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                          className="inline-flex items-center px-3 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:outline-none transition-all duration-200 shadow-sm"
                           title="Assign Imli"
                         >
                           <MdAssignment className="w-4 h-4 mr-2" />
@@ -275,25 +262,25 @@ const LocalsProfile = ({ navigateToAssignImli }) => {
       )}
 
       {filteredLocals.length > 0 && (
-        <div className="mt-8 bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-gray-200/50">
+        <div className="mt-8 bg-white rounded-xl p-6 shadow-sm border border-gray-200">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="bg-blue-100 p-2 rounded-lg">
-                <MdPeople className="text-blue-600 text-lg" />
+              <div className="bg-orange-50 p-2 rounded-lg">
+                <MdPeople className="text-orange-600 text-lg" />
               </div>
-              <p className="text-gray-700 font-medium">
+              <p className="text-gray-600 font-medium text-sm">
                 Showing{" "}
-                <span className="font-bold text-gray-900 bg-gray-100 px-2 py-1 rounded-md">
+                <span className="font-bold text-gray-900 bg-gray-100 px-2 py-0.5 rounded">
                   {filteredLocals.length}
                 </span>{" "}
-                of <span className="font-bold text-gray-900 bg-gray-100 px-2 py-1 rounded-md">{locals.length}</span>{" "}
+                of <span className="font-bold text-gray-900 bg-gray-100 px-2 py-0.5 rounded">{locals.length}</span>{" "}
                 total locals
               </p>
             </div>
             {searchTerm && (
               <button
                 onClick={() => setSearchTerm("")}
-                className="text-sm text-gray-600 hover:text-gray-900 font-semibold bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded-lg transition-all duration-200"
+                className="text-sm text-gray-600 hover:text-gray-900 font-medium bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded-lg transition-all duration-200"
               >
                 Clear Search
               </button>
@@ -303,7 +290,7 @@ const LocalsProfile = ({ navigateToAssignImli }) => {
       )}
 
       {/* Local Details Modal */}
-      <LocalDetailsModal 
+      <LocalDetailsModal
         isOpen={isModalOpen}
         onClose={closeModal}
         local={selectedLocal}
