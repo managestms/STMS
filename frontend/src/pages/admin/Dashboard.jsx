@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import {
   MdEco,
   MdCleaningServices,
@@ -7,14 +8,52 @@ import {
   MdSettings,
   MdInventory
 } from 'react-icons/md';
+import api from "../../api/axios";
 
 const Dashboard = ({ navigateToAssignImli, onPageChange }) => {
+  const [dashboardStats, setDashboardStats] = useState({
+    distributed: 0,
+    cleaned: 0,
+    pending: 0
+  });
+
+  const fetchDashboardData = async () => {
+    try {
+      const response = await api.get("/return_local");
+      if (response.data && response.data.data) {
+        const locals = response.data.data;
+
+        const distributed = locals.reduce((acc, local) => acc + (local.totalAssignedQuantity || 0), 0);
+        const cleaned = locals.reduce((acc, local) => acc + (local.totalReturnedQuantity || 0), 0);
+        const pending = distributed - cleaned;
+
+        setDashboardStats({
+          distributed,
+          cleaned,
+          pending
+        });
+      }
+    } catch (error) {
+      console.error("Error fetching dashboard data:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchDashboardData(); // Initial fetch
+
+    const intervalId = setInterval(() => {
+      fetchDashboardData();
+    }, 2000); // Poll every 2 seconds
+
+    return () => clearInterval(intervalId);
+  }, []);
+
   const stats = [
     {
       id: 1,
       title: "Raw Imli",
       titleUrdu: "اِمّی الا",
-      value: "78045 KG",
+      value: "78045 KG", // Static as per backend limitation
       borderColor: "border-orange-500",
       iconColor: "text-orange-600",
       iconBg: "bg-orange-50",
@@ -24,7 +63,7 @@ const Dashboard = ({ navigateToAssignImli, onPageChange }) => {
       id: 2,
       title: "Cleaned Imli",
       titleUrdu: "صاف الا",
-      value: "78045 KG",
+      value: `${dashboardStats.cleaned} KG`,
       borderColor: "border-green-500",
       iconColor: "text-green-600",
       iconBg: "bg-green-50",
@@ -34,7 +73,7 @@ const Dashboard = ({ navigateToAssignImli, onPageChange }) => {
       id: 3,
       title: "Distributed Imli to Locals",
       titleUrdu: "مقسم شدہ الا",
-      value: "78045 KG",
+      value: `${dashboardStats.distributed} KG`,
       borderColor: "border-blue-500",
       iconColor: "text-blue-600",
       iconBg: "bg-blue-50",
@@ -44,7 +83,7 @@ const Dashboard = ({ navigateToAssignImli, onPageChange }) => {
       id: 4,
       title: "Pending Imli to be returned",
       titleUrdu: "اِمّی الا",
-      value: "78045 KG",
+      value: `${dashboardStats.pending} KG`,
       borderColor: "border-purple-500",
       iconColor: "text-purple-600",
       iconBg: "bg-purple-50",
@@ -112,7 +151,7 @@ const Dashboard = ({ navigateToAssignImli, onPageChange }) => {
                   <div className="flex items-center gap-2 mt-2">
                     <div className="w-1.5 h-1.5 bg-green-500 rounded-full"></div>
                     <p className="text-gray-400 text-xs font-medium">
-                      Updated: 24 Oct 2025
+                      Updated: Just now
                     </p>
                   </div>
                 </div>
@@ -154,7 +193,7 @@ const Dashboard = ({ navigateToAssignImli, onPageChange }) => {
                       <p className="text-gray-800 text-xs font-semibold leading-relaxed mb-1">
                         {item.description}
                       </p>
-                      <p className="text-gray-400 text-[10px] font-medium">
+                      <p className="text-gray-400 text-xs font-medium">
                         {item.date}
                       </p>
                     </div>
