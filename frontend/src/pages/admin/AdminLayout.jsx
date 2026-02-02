@@ -9,6 +9,7 @@ import AssignImli from "./AssignImli"
 import ImliReturned from "./ImliReturned"
 import AddLocals from "./AddLocals"
 import LocalsProfile from "./LocalsProfile"
+import Payment from "./Payment"
 
 const AdminLayout = () => {
   const [activePage, setActivePage] = useState("dashboard")
@@ -36,13 +37,14 @@ const AdminLayout = () => {
     assignImli: { component: AssignImli, title: "ASSIGN IMLI", props: navigationProps },
     imliReturned: { component: ImliReturned, title: "IMLI RETURNED", props: {} },
     localsProfile: { component: LocalsProfile, title: "LOCALS PROFILE", props: { navigateToAssignImli } },
+    payment: { component: Payment, title: "PAYMENT", props: {} },
   }
 
   const currentPage = pageConfig[activePage]
   const CurrentComponent = currentPage.component
 
   return (
-    <div className="flex h-screen bg-gray-100 overflow-hidden">
+    <div className="flex h-screen bg-gray-100 dark:bg-gray-900 overflow-hidden transition-colors duration-300">
       <Sidebar
         activePage={activePage}
         onPageChange={handlePageChange}
