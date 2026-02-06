@@ -17,10 +17,10 @@ const GlassHeader = ({ onLogin }) => {
                     filter: invert(1) brightness(0);
                 }
             `}</style>
-            <header className="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-full max-w-4xl px-4">
+            <header className="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-full max-w-5xl px-4">
                 <div className={`transition-all duration-300 rounded-2xl ${scrolled
-                    ? 'backdrop-blur-xl bg-white/70 shadow-2xl border border-white/40'
-                    : 'backdrop-blur-lg bg-white/20 border border-white/30 shadow-xl'
+                    ? 'backdrop-blur-[20px] bg-gradient-to-br from-white/60 to-white/30 shadow-[0_8px_32px_0_rgba(31,38,135,0.07)] border border-white/40 ring-1 ring-white/40 backdrop-saturate-200'
+                    : 'backdrop-blur-[10px] bg-gradient-to-br from-white/30 to-white/10 border border-white/20 shadow-[0_4px_30px_rgba(0,0,0,0.03)] backdrop-saturate-150'
                     }`}>
                     <div className="px-6">
                         <div className="flex items-center justify-between h-14">

@@ -5,6 +5,10 @@ const HeroSection = () => {
         document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' });
     };
 
+    const scrollToHowItWorksSection = () => {
+        document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' });
+    };
+
     return (
         <section id="hero" className="relative min-h-screen flex items-center justify-center overflow-hidden bg-white">
             {/* Minimal Background with Overlay */}
@@ -17,7 +21,7 @@ const HeroSection = () => {
 
             <div className="relative z-10 max-w-5xl mx-auto px-6 text-center">
                 <span className="inline-block py-1 px-3 rounded-full bg-white/70 text-[#ff5a1f] text-sm font-medium border border-[#ff5a1f]/20 mb-6 backdrop-blur-sm animate-fadeIn">
-                    EST. 2024 • PREMIUM TAMARIND SOURCE
+                    EST. 2004 • PREMIUM TAMARIND SOURCE
                 </span>
 
                 <h1 className="text-6xl md:text-8xl font-bold tracking-tighter text-gray-900 mb-8 leading-tight animate-slideInUp drop-shadow-sm">
@@ -37,9 +41,11 @@ const HeroSection = () => {
                         className="px-8 py-4 rounded-full bg-[#ff5a1f] text-white font-bold hover:bg-[#e64f1b] transition-all flex items-center gap-2 group shadow-lg shadow-[#ff5a1f]/20"
                     >
                         Learn More
-                        <ArrowDown className="w-4 h-4 text-white group-hover:translate-y-1 transition-transform" />
+
                     </button>
-                    <button className="px-8 py-4 rounded-full border-2 border-[#ff5a1f]/30 text-[#ff5a1f] font-semibold hover:bg-[#ff5a1f]/10 transition-all backdrop-blur-sm">
+                    <button
+                        onClick={scrollToHowItWorksSection}
+                        className="px-8 py-4 rounded-full border-2 border-[#ff5a1f]/30 text-[#ff5a1f] font-semibold hover:bg-[#ff5a1f]/10 transition-all backdrop-blur-sm">
                         Our Process
                     </button>
                 </div>

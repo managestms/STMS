@@ -1,6 +1,4 @@
-"use client"
 import ScrollReveal from '../ui/ScrollReveal'
-import Card3D from '../ui/Card3D'
 import {
     MdEco,
     MdPeople,
@@ -39,49 +37,53 @@ const HowItWorksSection = () => {
     ]
 
     return (
-        <section className="py-24 bg-gradient-to-b from-gray-50 to-white relative overflow-hidden">
-            {/* Background Pattern */}
-            <div className="absolute inset-0 opacity-50">
-                <div className="absolute top-20 left-10 w-72 h-72 bg-orange-100 rounded-full filter blur-3xl" />
-                <div className="absolute bottom-20 right-10 w-96 h-96 bg-orange-50 rounded-full filter blur-3xl" />
+        <section id="how-it-works" className="py-24 bg-gradient-to-b from-white via-[#fff7f1] to-white relative overflow-hidden">
+            {/* Background Pattern similar to Stats/Hero */}
+            <div className="absolute inset-0 z-0 pointer-events-none">
+                <div className="absolute -top-40 -left-40 h-[500px] w-[500px] rounded-full bg-[#ff5a1f]/5 blur-[100px]" />
+                <div className="absolute top-1/2 right-0 h-[300px] w-[300px] rounded-full bg-[#ff5a1f]/5 blur-[80px]" />
             </div>
 
             <div className="container mx-auto px-6 relative z-10">
                 <ScrollReveal>
-                    <h2 className="text-4xl md:text-5xl font-bold text-center mb-4 text-gray-800">
-                        How It <span className="text-[#FF4D00]">Works</span>
-                    </h2>
-                    <p className="text-xl text-gray-600 text-center mb-16 max-w-2xl mx-auto">
-                        Our streamlined process ensures quality at every step
-                    </p>
+                    <div className="text-center max-w-2xl mx-auto mb-16">
+                        <p className="text-sm font-bold text-[#ff5a1f] tracking-widest uppercase mb-3">Our Process</p>
+                        <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+                            How It <span className="text-[#ff5a1f]">Works</span>
+                        </h2>
+                        <p className="text-gray-600 text-lg">
+                            Our streamlined process ensures quality at every step
+                        </p>
+                    </div>
                 </ScrollReveal>
 
                 <div className="relative">
-                    {/* Connection Line */}
-                    <div className="hidden lg:block absolute top-1/2 left-0 right-0 h-1 bg-gradient-to-r from-orange-200 via-[#FF4D00] to-orange-200 transform -translate-y-1/2" />
+                    {/* Connection Line - Simplified */}
+                    <div className="hidden lg:block absolute top-12 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-[#ff5a1f]/20 to-transparent" />
 
-                    <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-8">
+                    <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6">
                         {steps.map((step, index) => {
                             const IconComponent = step.icon
                             return (
                                 <ScrollReveal key={index} delay={index * 0.1}>
-                                    <Card3D className="h-full">
-                                        <div className="bg-white rounded-2xl p-6 shadow-xl hover:shadow-2xl transition-all duration-300 border border-gray-100 h-full min-h-[280px] group relative flex flex-col justify-between">
-                                            {/* Step Number */}
-                                            <div className="absolute -top-4 -right-2 w-8 h-8 bg-[#FF4D00] text-white rounded-full flex items-center justify-center font-bold text-sm shadow-lg">
+                                    <div className="relative flex flex-col items-center text-center group">
+
+                                        {/* Step Icon Circle */}
+                                        <div className="w-24 h-24 bg-white rounded-2xl border border-[#ff5a1f]/10 shadow-sm flex items-center justify-center mb-6 relative z-10 group-hover:border-[#ff5a1f]/30 group-hover:shadow-md transition-all duration-300 group-hover:-translate-y-1">
+                                            <div className="absolute -top-3 -right-3 w-8 h-8 bg-[#ff5a1f] text-white rounded-full flex items-center justify-center font-bold text-sm shadow-lg border-2 border-white">
                                                 {index + 1}
                                             </div>
-                                            <div className="w-16 h-16 bg-gradient-to-br from-[#FF4D00] to-[#ff9b54] rounded-2xl flex items-center justify-center mb-4 mx-auto group-hover:scale-110 transition-transform duration-300 shadow-lg flex-shrink-0">
-                                                <IconComponent className="text-3xl text-white" />
-                                            </div>
-                                            <h3 className="text-lg font-bold text-gray-800 mb-2 text-center group-hover:text-[#FF4D00] transition-colors flex-shrink-0">
-                                                {step.title}
-                                            </h3>
-                                            <p className="text-gray-600 text-sm text-center leading-relaxed flex-1">
-                                                {step.description}
-                                            </p>
+                                            <IconComponent className="text-4xl text-[#ff5a1f] group-hover:scale-110 transition-transform duration-300" />
                                         </div>
-                                    </Card3D>
+
+                                        {/* Content */}
+                                        <h3 className="text-lg font-bold text-gray-900 mb-2 group-hover:text-[#ff5a1f] transition-colors">
+                                            {step.title}
+                                        </h3>
+                                        <p className="text-sm text-gray-600 leading-relaxed px-2">
+                                            {step.description}
+                                        </p>
+                                    </div>
                                 </ScrollReveal>
                             )
                         })}

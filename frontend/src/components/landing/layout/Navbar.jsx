@@ -15,7 +15,8 @@ const Navbar = () => {
 
     const scrollToSection = (id) => {
         setMobileMenuOpen(false);
-        const element = document.getElementById(id);
+        const elementId = id === 'process' ? 'how-it-works' : id;
+        const element = document.getElementById(elementId);
         if (element) {
             element.scrollIntoView({ behavior: 'smooth' });
         }
@@ -23,7 +24,9 @@ const Navbar = () => {
 
     return (
         <nav
-            className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${scrolled ? 'bg-white/90 backdrop-blur-md shadow-sm py-4' : 'bg-white/70 backdrop-blur-sm py-6'
+            className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${scrolled
+                ? 'backdrop-blur-[20px] bg-gradient-to-r from-white/70 via-white/50 to-white/70 border-b border-white/40 shadow-[0_4px_30px_rgba(0,0,0,0.03)] backdrop-saturate-200 py-4'
+                : 'backdrop-blur-sm bg-white/10 border-b border-white/10 py-6'
                 }`}
         >
             <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
@@ -56,8 +59,8 @@ const Navbar = () => {
                     <button
                         onClick={() => navigate('/login')}
                         className={`px-5 py-2.5 rounded-full text-sm font-medium transition-all ${scrolled
-                                ? 'bg-[#ff5a1f] text-white hover:bg-[#e64f1b]'
-                                : 'bg-[#ff5a1f] text-white hover:bg-[#e64f1b]'
+                            ? 'bg-[#ff5a1f] text-white hover:bg-[#e64f1b]'
+                            : 'bg-[#ff5a1f] text-white hover:bg-[#e64f1b]'
                             }`}
                     >
                         Login
