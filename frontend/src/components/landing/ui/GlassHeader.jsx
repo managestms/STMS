@@ -31,9 +31,6 @@ const GlassHeader = ({ onLogin }) => {
                                     alt="Super Imli Traders"
                                     className={`h-8 w-auto transition-all duration-300 ${scrolled ? 'logo-scrolled' : ''}`}
                                 />
-                                <span className={`text-lg font-bold transition-colors duration-300 ${scrolled ? 'text-black' : 'text-white'}`}>
-                                    Super Imli Traders
-                                </span>
                             </div>
 
                             {/* Login Button */}

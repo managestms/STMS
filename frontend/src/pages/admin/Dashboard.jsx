@@ -9,6 +9,7 @@ import {
   MdInventory
 } from 'react-icons/md';
 import api from "../../api/axios";
+import SackEntry from './SackEntry';
 
 const Dashboard = ({ navigateToAssignImli, onPageChange }) => {
   const [dashboardStats, setDashboardStats] = useState({
@@ -163,45 +164,9 @@ const Dashboard = ({ navigateToAssignImli, onPageChange }) => {
 
       {/* Activities and Quick Actions */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-        {/* Activities */}
-        <div className="lg:col-span-2 bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="text-lg font-bold text-gray-900">
-              Recent Activities
-            </h3>
-            <button className="text-orange-600 text-sm font-semibold hover:text-orange-700">
-              View All
-            </button>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {activities.map((activity, idx) => (
-              <div
-                key={idx}
-                className="bg-gray-50 rounded-lg p-4 border border-gray-100"
-              >
-                <h4 className="font-bold text-xs text-gray-500 uppercase tracking-wider mb-4 border-b border-gray-200 pb-2">
-                  {activity.title}
-                </h4>
-
-                <div className="space-y-3">
-                  {activity.items.map((item, itemIdx) => (
-                    <div
-                      key={itemIdx}
-                      className="bg-white p-3 rounded border border-gray-200 shadow-sm"
-                    >
-                      <p className="text-gray-800 text-xs font-semibold leading-relaxed mb-1">
-                        {item.description}
-                      </p>
-                      <p className="text-gray-400 text-xs font-medium">
-                        {item.date}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
+        {/* Sack Entry - Replaces 'Recent Activities' */}
+        <div className="lg:col-span-2">
+          <SackEntry />
         </div>
 
         {/* Quick Actions */}

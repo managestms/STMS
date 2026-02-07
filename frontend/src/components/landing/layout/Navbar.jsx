@@ -29,7 +29,7 @@ const Navbar = () => {
                 : 'backdrop-blur-sm bg-white/10 border-b border-white/10 py-6'
                 }`}
         >
-            <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
+            <div className="max-w-7xl mx-auto px-6 flex items-center justify-between relative">
                 {/* Logo */}
                 <div className="flex items-center gap-3 cursor-pointer" onClick={() => scrollToSection('hero')}>
                     <img
@@ -37,14 +37,11 @@ const Navbar = () => {
                         alt="Super Imli Traders"
                         className={`h-10 w-auto transition-all duration-300 ${scrolled ? 'brightness-0' : 'brightness-0'}`}
                     />
-                    <span className={`text-xl font-bold tracking-tight transition-colors ${scrolled ? 'text-gray-900' : 'text-gray-900'
-                        }`}>
-                        Super Imli Traders
-                    </span>
+
                 </div>
 
-                {/* Desktop Menu */}
-                <div className="hidden md:flex items-center gap-8">
+                {/* Centered Navigation */}
+                <div className="hidden md:flex items-center gap-18 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
                     {['About', 'Process', 'Gallery', 'Stats'].map((item) => (
                         <button
                             key={item}
@@ -55,7 +52,10 @@ const Navbar = () => {
                             {item}
                         </button>
                     ))}
+                </div>
 
+                {/* Right Side Actions */}
+                <div className="hidden md:block">
                     <button
                         onClick={() => navigate('/login')}
                         className={`px-5 py-2.5 rounded-full text-sm font-medium transition-all ${scrolled
