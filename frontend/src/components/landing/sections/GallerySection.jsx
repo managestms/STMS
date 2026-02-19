@@ -5,22 +5,22 @@ const galleryImages = [
     {
         title: "Raw Collection",
         desc: "Sourcing directly from farms",
-        url: "https://images.unsplash.com/photo-1464226184884-fa280b87c399?q=80&w=2670&auto=format&fit=crop"
+        url: "/Rawimli.jpeg"
     },
     {
         title: "Sorting & Grading",
         desc: "Ensuring premium quality",
-        url: "https://images.unsplash.com/photo-1595855793315-0219c6c74751?q=80&w=2670&auto=format&fit=crop"
+        url: "/Sorting.png"
     },
     {
         title: "Hygienic Packaging",
         desc: "Sealed for freshness",
-        url: "https://images.unsplash.com/photo-1605626966159-88339b362031?q=80&w=2670&auto=format&fit=crop"
+        url: "Packaging.png"
     },
     {
         title: "Distribution",
         desc: "Reaching global markets",
-        url: "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?q=80&w=2670&auto=format&fit=crop"
+        url: "Distributing.png"
     }
 ];
 
