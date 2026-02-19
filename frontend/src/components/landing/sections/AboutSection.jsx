@@ -12,8 +12,7 @@ const AboutSection = () => {
                         <div className="relative h-[500px] w-full bg-zinc-100 rounded-3xl overflow-hidden shadow-xl">
                             {/* Placeholder for About Image */}
                             <img
-                                src="https://images.unsplash.com/photo-1599579040776-e17f4add4582?q=80&w=2574&auto=format&fit=crop"
-                                alt="Processing tamarind"
+                                src="/About.png"
                                 className="w-full h-full object-cover"
                             />
                         </div>

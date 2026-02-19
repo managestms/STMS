@@ -53,7 +53,7 @@ const Dashboard = ({ navigateToAssignImli, onPageChange }) => {
     {
       id: 1,
       title: "Raw Imli",
-      titleUrdu: "اِمّی الا",
+      titleUrdu: "خام املی",
       value: "78045 KG", // Static as per backend limitation
       borderColor: "border-orange-500",
       iconColor: "text-orange-600",
@@ -63,7 +63,7 @@ const Dashboard = ({ navigateToAssignImli, onPageChange }) => {
     {
       id: 2,
       title: "Cleaned Imli",
-      titleUrdu: "صاف الا",
+      titleUrdu: "صاف املی",
       value: `${dashboardStats.cleaned} KG`,
       borderColor: "border-green-500",
       iconColor: "text-green-600",
@@ -73,7 +73,7 @@ const Dashboard = ({ navigateToAssignImli, onPageChange }) => {
     {
       id: 3,
       title: "Distributed Imli to Locals",
-      titleUrdu: "مقسم شدہ الا",
+      titleUrdu: "تقسیم شدہ املی",
       value: `${dashboardStats.distributed} KG`,
       borderColor: "border-blue-500",
       iconColor: "text-blue-600",
@@ -83,7 +83,7 @@ const Dashboard = ({ navigateToAssignImli, onPageChange }) => {
     {
       id: 4,
       title: "Pending Imli to be returned",
-      titleUrdu: "اِمّی الا",
+      titleUrdu: "واپس آنے والی املی",
       value: `${dashboardStats.pending} KG`,
       borderColor: "border-purple-500",
       iconColor: "text-purple-600",
@@ -135,9 +135,6 @@ const Dashboard = ({ navigateToAssignImli, onPageChange }) => {
                   <p className="text-gray-500 font-medium text-sm mb-1">
                     {stat.title}
                   </p>
-                  <p className="urdu-ui text-gray-400 text-lg font-bold mb-1">
-                    {stat.titleUrdu}
-                  </p>
                 </div>
                 <div className={`${stat.iconBg} p-2.5 rounded-lg`}>
                   <IconComponent className={`text-xl ${stat.iconColor}`} />
@@ -149,12 +146,11 @@ const Dashboard = ({ navigateToAssignImli, onPageChange }) => {
                   <h3 className="text-2xl font-bold text-gray-900">
                     {stat.value}
                   </h3>
-                  <div className="flex items-center gap-2 mt-2">
-                    <div className="w-1.5 h-1.5 bg-green-500 rounded-full"></div>
-                    <p className="text-gray-400 text-xs font-medium">
-                      Updated: Just now
-                    </p>
-                  </div>
+                </div>
+                <div className="text-right">
+                  <p className="urdu-ui text-xl font-bold text-gray-900 -mb-1">
+                    {stat.titleUrdu}
+                  </p>
                 </div>
               </div>
             </div>

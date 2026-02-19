@@ -3,26 +3,18 @@ import { MdAdd } from 'react-icons/md';
 
 import api from "../../api/axios";
 
-const SackEntryColumn = () => {
-    const [rows, setRows] = useState([{ localId: '', quantity: '', delivered: false }]);
-    const [allLocals, setAllLocals] = useState([]);
-    const [activeDropdown, setActiveDropdown] = useState(null);
-
-    // Fetch all locals on component mount
-    React.useEffect(() => {
-        const fetchLocals = async () => {
-            try {
-                const response = await api.post("/return_local");
-                if (response.data && response.data.data) {
-                    setAllLocals(response.data.data);
-                }
-            } catch (error) {
-                console.error("Error fetching locals:", error);
-            }
-        };
-        fetchLocals();
-    }, []);
-
+const SackEntryColumn = ({
+    rows,
+    activeDropdown,
+    handleChange,
+    handleSelectLocal,
+    getFilteredLocals,
+    toggleRowDelivered,
+    toggleAllDelivered,
+    allDelivered,
+    addRow,
+    setActiveDropdown
+}) => {
     // Click outside to close dropdown
     React.useEffect(() => {
         const handleClickOutside = (e) => {
@@ -32,49 +24,7 @@ const SackEntryColumn = () => {
         };
         document.addEventListener('mousedown', handleClickOutside);
         return () => document.removeEventListener('mousedown', handleClickOutside);
-    }, []);
-
-    const addRow = () => {
-        setRows([...rows, { localId: '', quantity: '', delivered: false }]);
-    };
-
-    const handleChange = (index, field, value) => {
-        const newRows = [...rows];
-        newRows[index][field] = value;
-        setRows(newRows);
-
-        if (field === 'localId') {
-            setActiveDropdown(index);
-        }
-    };
-
-    const handleSelectLocal = (index, local) => {
-        const newRows = [...rows];
-        newRows[index].localId = local.LocalID;
-        setRows(newRows);
-        setActiveDropdown(null);
-    };
-
-    const getFilteredLocals = (query) => {
-        if (!query) return [];
-        return allLocals.filter(local =>
-            local.LocalID.toString().toLowerCase().includes(query.toLowerCase()) ||
-            local.LocalName.toLowerCase().includes(query.toLowerCase())
-        );
-    };
-
-    const toggleRowDelivered = (index) => {
-        const newRows = [...rows];
-        newRows[index].delivered = !newRows[index].delivered;
-        setRows(newRows);
-    };
-
-    const allDelivered = rows.length > 0 && rows.every(row => row.delivered);
-    const toggleAllDelivered = () => {
-        const newDeliveredState = !allDelivered;
-        const newRows = rows.map(row => ({ ...row, delivered: newDeliveredState }));
-        setRows(newRows);
-    };
+    }, [setActiveDropdown]);
 
     return (
         <div className="bg-white rounded-xl border border-gray-200 flex flex-col h-full shadow-sm overflow-hidden">
@@ -175,20 +125,102 @@ const SackEntryColumn = () => {
 
 const SackEntry = () => {
     const currentDate = new Date().toLocaleDateString('en-GB');
+    const [rows, setRows] = useState([{ localId: '', quantity: '', delivered: false }]);
+    const [allLocals, setAllLocals] = useState([]);
+    const [activeDropdown, setActiveDropdown] = useState(null);
+
+    // Fetch all locals on component mount
+    React.useEffect(() => {
+        const fetchLocals = async () => {
+            try {
+                const response = await api.post("/getlocalData");
+                if (response.data && response.data.data) {
+                    setAllLocals(response.data.data);
+                }
+            } catch (error) {
+                console.error("Error fetching locals:", error);
+            }
+        };
+        fetchLocals();
+    }, []);
+
+    const addRow = () => {
+        setRows([...rows, { localId: '', quantity: '', delivered: false }]);
+    };
+
+    const handleChange = (index, field, value) => {
+        const newRows = [...rows];
+        newRows[index][field] = value;
+        setRows(newRows);
+
+        if (field === 'localId') {
+            setActiveDropdown(index);
+        }
+    };
+
+    const handleSelectLocal = (index, local) => {
+        const newRows = [...rows];
+        newRows[index].localId = local.LocalID;
+        setRows(newRows);
+        setActiveDropdown(null);
+    };
+
+    const getFilteredLocals = (query) => {
+        if (!query) return [];
+        return allLocals.filter(local =>
+            local.LocalID.toString().toLowerCase().includes(query.toLowerCase()) ||
+            local.LocalName.toLowerCase().includes(query.toLowerCase())
+        );
+    };
+
+    const toggleRowDelivered = (index) => {
+        const newRows = [...rows];
+        newRows[index].delivered = !newRows[index].delivered;
+        setRows(newRows);
+    };
+
+    const allDelivered = rows.length > 0 && rows.every(row => row.delivered);
+    const toggleAllDelivered = () => {
+        const newDeliveredState = !allDelivered;
+        const newRows = rows.map(row => ({ ...row, delivered: newDeliveredState }));
+        setRows(newRows);
+    };
 
     return (
         <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200 h-full flex flex-col">
             <div className="flex items-center justify-between mb-6 shrink-0">
-                <h3 className="text-lg font-bold text-gray-900">
-                    Sack Entry
-                </h3>
-                <span className="text-sm font-medium text-gray-500 bg-gray-100 px-3 py-1 rounded-full border border-gray-200">
-                    {currentDate}
-                </span>
+                <div className="flex items-center gap-4">
+                    <h3 className="text-lg font-bold text-gray-900">
+                        Sack Entry
+                    </h3>
+                    <span className="text-sm font-medium text-gray-500 bg-gray-100 px-3 py-1 rounded-full border border-gray-200">
+                        {currentDate}
+                    </span>
+                </div>
+                <div className="flex items-center gap-3">
+                    <button
+                        onClick={addRow}
+                        className="text-gray-500 hover:text-orange-600 p-1.5 hover:bg-orange-50 rounded-lg transition-all duration-200 flex items-center justify-center border border-transparent hover:border-orange-100"
+                        title="Add New Row"
+                    >
+                        <MdAdd className="text-xl" />
+                    </button>
+                </div>
             </div>
 
             <div className="flex-1 min-h-0">
-                <SackEntryColumn />
+                <SackEntryColumn
+                    rows={rows}
+                    activeDropdown={activeDropdown}
+                    handleChange={handleChange}
+                    handleSelectLocal={handleSelectLocal}
+                    getFilteredLocals={getFilteredLocals}
+                    toggleRowDelivered={toggleRowDelivered}
+                    toggleAllDelivered={toggleAllDelivered}
+                    allDelivered={allDelivered}
+                    addRow={addRow}
+                    setActiveDropdown={setActiveDropdown}
+                />
             </div>
         </div>
     );
