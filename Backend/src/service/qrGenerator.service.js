@@ -1,12 +1,15 @@
 import qrcode from "qrcode";
 import { uploadQR } from "./cloudinary.service.js";
 
-export const generateQRCode = async (text) => {
-    if (!text) throw new Error("Text is required to generate QR code");
+export const generateQRCode = async (upiId, name = "Local") => {
+    if (!upiId) throw new Error("UPI ID is required to generate QR code");
 
     try {
+        // Build UPI payment deep link URL (works with GPay, PhonePe, Paytm etc.)
+        const upiUrl = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(name)}&cu=INR`;
+
         // 1. Generate QR as base64 Data URL
-        const base64QR = await qrcode.toDataURL(text);
+        const base64QR = await qrcode.toDataURL(upiUrl);
 
         // 2. Upload to Cloudinary and get the secure URL
         const cloudinaryUrl = await uploadQR(base64QR);

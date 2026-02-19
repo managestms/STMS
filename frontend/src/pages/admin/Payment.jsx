@@ -1,6 +1,8 @@
+"use client"
+
 import { useState, useEffect } from "react"
-import { MdPeople, MdRefresh, MdSearch, MdError, MdPayment, MdKeyboardArrowDown, MdKeyboardArrowUp, MdCheckCircle, MdMoney, MdPayment as MdOnlinePayment } from 'react-icons/md'
-import axios from "../../api/axios"
+import { MdPayment, MdRefresh, MdSearch, MdError, MdKeyboardArrowDown, MdKeyboardArrowUp, MdCheckCircle, MdMoney, MdPayment as MdOnlinePayment } from 'react-icons/md'
+import api from "../../api/axios"
 
 const Payment = () => {
     const [locals, setLocals] = useState([])
@@ -9,8 +11,12 @@ const Payment = () => {
     const [searchTerm, setSearchTerm] = useState("")
     const [filteredLocals, setFilteredLocals] = useState([])
     const [expandedLocalId, setExpandedLocalId] = useState(null)
-    const [paymentMethod, setPaymentMethod] = useState("Cash") // Default payment method
-    const RATE_PER_UNIT = 15
+    const [paymentMethod, setPaymentMethod] = useState("Cash")
+    const [orderData, setOrderData] = useState(null)
+    const [orderLoading, setOrderLoading] = useState(false)
+    const [paymentLoading, setPaymentLoading] = useState(false)
+    const [paymentResult, setPaymentResult] = useState(null)
+    const [paymentError, setPaymentError] = useState(null)
 
     useEffect(() => {
         fetchLocals()
@@ -20,7 +26,7 @@ const Payment = () => {
         try {
             setLoading(true)
             setError(null)
-            const response = await axios.post("http://localhost:8000/api/return_local")
+            const response = await api.post("/return_local")
             if (response.data.data) {
                 setLocals(response.data.data)
                 setFilteredLocals(response.data.data)
@@ -47,17 +53,60 @@ const Payment = () => {
         return () => clearTimeout(debounceTimer)
     }, [searchTerm, locals])
 
-    const toggleExpand = (localId) => {
-        if (expandedLocalId === localId) {
-            setExpandedLocalId(null)
-        } else {
-            setExpandedLocalId(localId)
-            setPaymentMethod("Cash") // Reset to Cash when expanding a new one
+    const fetchOrderReference = async (localID) => {
+        try {
+            setOrderLoading(true)
+            setOrderData(null)
+            setPaymentResult(null)
+            setPaymentError(null)
+            const response = await api.post("/order-reference", { localID: String(localID) })
+            setOrderData(response.data.data)
+        } catch (error) {
+            const msg = error.response?.data?.message || "Failed to fetch order details"
+            if (msg.includes("No pending")) {
+                setOrderData(null)
+                setPaymentError("No pending returns for this local")
+            } else {
+                setPaymentError(msg)
+            }
+        } finally {
+            setOrderLoading(false)
         }
     }
 
-    const calculateTotal = (quantity) => {
-        return (quantity || 0) * RATE_PER_UNIT
+    const toggleExpand = (local) => {
+        if (expandedLocalId === local._id) {
+            setExpandedLocalId(null)
+            setOrderData(null)
+            setPaymentResult(null)
+            setPaymentError(null)
+        } else {
+            setExpandedLocalId(local._id)
+            setPaymentMethod("Cash")
+            setPaymentResult(null)
+            setPaymentError(null)
+            fetchOrderReference(local.LocalID)
+        }
+    }
+
+    const handleConfirmPayment = async (localId) => {
+        if (!orderData) return
+        try {
+            setPaymentLoading(true)
+            setPaymentError(null)
+            setPaymentResult(null)
+            const response = await api.post("/confirm-payment", {
+                localId: localId,
+                method: paymentMethod,
+            })
+            setPaymentResult(response.data.data)
+            // Refresh locals list after successful payment
+            fetchLocals()
+        } catch (error) {
+            setPaymentError(error.response?.data?.message || "Payment failed. Please try again.")
+        } finally {
+            setPaymentLoading(false)
+        }
     }
 
     if (loading) {
@@ -169,12 +218,11 @@ const Payment = () => {
                         const isExpanded = expandedLocalId === local._id
                         const cleanedQty = local.totalReturnedQuantity || 0
                         const assignedQty = local.totalAssignedQuantity || 0
-                        const totalAmount = calculateTotal(cleanedQty)
 
                         return (
                             <div key={local._id} className={`bg-white rounded-2xl shadow-sm border transition-all duration-300 overflow-hidden ${isExpanded ? 'border-orange-500 ring-1 ring-orange-500/20 shadow-orange-100 shadow-xl' : 'border-gray-200 hover:border-orange-300'}`}>
                                 {/* Header Row */}
-                                <div className={`p-3 flex items-center justify-between cursor-pointer transition-colors ${isExpanded ? 'bg-orange-50/30' : 'bg-white hover:bg-gray-50'}`} onClick={() => toggleExpand(local._id)}>
+                                <div className={`p-3 flex items-center justify-between cursor-pointer transition-colors ${isExpanded ? 'bg-orange-50/30' : 'bg-white hover:bg-gray-50'}`} onClick={() => toggleExpand(local)}>
                                     <div className="flex items-center space-x-3">
                                         <div className="flex-shrink-0">
                                             <div className={`h-10 w-10 rounded-full flex items-center justify-center shadow-sm border-2 transition-all duration-300 ${isExpanded ? 'bg-orange-500 border-orange-400' : 'bg-white border-orange-500'}`}>
@@ -208,102 +256,173 @@ const Payment = () => {
                                 </div>
 
                                 {/* Expanded Content */}
-                                <div className={`transition-all duration-500 ease-in-out overflow-hidden ${isExpanded ? 'max-h-[600px] opacity-100' : 'max-h-0 opacity-0'}`}>
+                                <div className={`transition-all duration-500 ease-in-out overflow-hidden ${isExpanded ? 'max-h-[800px] opacity-100' : 'max-h-0 opacity-0'}`}>
                                     <div className="p-8 bg-white border-t border-gray-100">
-                                        <div className="flex flex-col lg:flex-row justify-between gap-10">
-                                            <div className="lg:w-2/3">
-                                                <div className="mb-8 p-4 bg-orange-50/50 rounded-lg border-l-4 border-orange-500 text-gray-700 font-medium text-sm">
-                                                    {(() => {
-                                                        const date = local.updatedAt ? new Date(local.updatedAt) : new Date();
-                                                        // Find the most recent Thursday
-                                                        const day = date.getDay();
-                                                        const diff = date.getDate() - day + (day >= 4 ? 4 : -3);
-                                                        const start = new Date(date);
-                                                        start.setDate(diff);
-
-                                                        const end = new Date(start);
-                                                        end.setDate(start.getDate() + 7);
-
-                                                        const format = (d) => `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth() + 1).toString().padStart(2, '0')}`;
-
-                                                        return `Period: Thursday ${format(start)} to ${format(end)}`;
-                                                    })()}
-                                                </div>
-
-                                                <div className="overflow-hidden rounded-lg border border-gray-200">
-                                                    <table className="w-full text-left">
-                                                        <thead className="bg-gray-50 text-gray-600 uppercase text-xs font-semibold tracking-wider">
-                                                            <tr>
-                                                                <th className="px-6 py-4">Date</th>
-                                                                <th className="px-6 py-4">Assigned Quantity</th>
-                                                                <th className="px-6 py-4">Cleaned Qty.</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody className="divide-y divide-gray-100 text-gray-700 text-sm">
-                                                            <tr className="hover:bg-gray-50/50 transition-colors">
-                                                                <td className="px-6 py-4 font-medium">
-                                                                    {local.updatedAt ? new Date(local.updatedAt).toLocaleDateString("en-GB", {
-                                                                        day: "numeric",
-                                                                        month: "short",
-                                                                        year: "numeric"
-                                                                    }) : "-"}
-                                                                </td>
-                                                                <td className="px-6 py-4">{assignedQty}</td>
-                                                                <td className="px-6 py-4">{cleanedQty}</td>
-                                                            </tr>
-                                                            <tr className="bg-gray-50/50 text-gray-900 font-semibold">
-                                                                <td className="px-6 py-4">Total :</td>
-                                                                <td className="px-6 py-4">{assignedQty}</td>
-                                                                <td className="px-6 py-4">{cleanedQty}</td>
-                                                            </tr>
-                                                        </tbody>
-                                                    </table>
-                                                </div>
+                                        {orderLoading ? (
+                                            <div className="flex items-center justify-center py-12">
+                                                <div className="w-8 h-8 border-4 border-orange-500 border-t-transparent rounded-full animate-spin"></div>
+                                                <span className="ml-3 text-gray-600 font-medium">Loading order details...</span>
                                             </div>
+                                        ) : paymentError && !orderData && !paymentResult ? (
+                                            <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg text-center">
+                                                <p className="text-yellow-800 font-medium">{paymentError}</p>
+                                            </div>
+                                        ) : (
+                                            <div className="flex flex-col lg:flex-row justify-between gap-10">
+                                                <div className="lg:w-2/3">
+                                                    <div className="mb-8 p-4 bg-orange-50/50 rounded-lg border-l-4 border-orange-500 text-gray-700 font-medium text-sm">
+                                                        {(() => {
+                                                            const date = local.updatedAt ? new Date(local.updatedAt) : new Date();
+                                                            const day = date.getDay();
+                                                            const diff = date.getDate() - day + (day >= 4 ? 4 : -3);
+                                                            const start = new Date(date);
+                                                            start.setDate(diff);
+                                                            const end = new Date(start);
+                                                            end.setDate(start.getDate() + 7);
+                                                            const format = (d) => `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth() + 1).toString().padStart(2, '0')}`;
+                                                            return `Period: Thursday ${format(start)} to ${format(end)}`;
+                                                        })()}
+                                                    </div>
 
-                                            <div className="lg:w-1/3 flex flex-col justify-between p-6 bg-white rounded-xl border border-gray-200 shadow-sm">
-                                                <div className="flex justify-between items-center mb-8">
-                                                    <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Order Reference</span>
-                                                    <span className="px-2 py-1 bg-gray-100 rounded text-xs font-mono font-medium text-gray-600">238-92</span>
-                                                </div>
-
-                                                <div className="text-center mb-8 pb-8 border-b border-gray-100">
-                                                    <div className="text-gray-500 text-xs font-medium mb-2 uppercase tracking-wide">Amount to Pay</div>
-                                                    <div className="text-3xl font-bold text-gray-900 flex items-center justify-center gap-2">
-                                                        <span>{cleanedQty}</span>
-                                                        <span className="text-gray-400 text-xl">×</span>
-                                                        <span>{RATE_PER_UNIT}</span>
-                                                        <span className="text-gray-400 text-xl">=</span>
-                                                        <span className="text-orange-600">₹{totalAmount}</span>
+                                                    <div className="overflow-hidden rounded-lg border border-gray-200">
+                                                        <table className="w-full text-left">
+                                                            <thead className="bg-gray-50 text-gray-600 uppercase text-xs font-semibold tracking-wider">
+                                                                <tr>
+                                                                    <th className="px-6 py-4">Date</th>
+                                                                    <th className="px-6 py-4">Assigned Quantity</th>
+                                                                    <th className="px-6 py-4">Cleaned Qty.</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody className="divide-y divide-gray-100 text-gray-700 text-sm">
+                                                                <tr className="hover:bg-gray-50/50 transition-colors">
+                                                                    <td className="px-6 py-4 font-medium">
+                                                                        {local.updatedAt ? new Date(local.updatedAt).toLocaleDateString("en-GB", {
+                                                                            day: "numeric",
+                                                                            month: "short",
+                                                                            year: "numeric"
+                                                                        }) : "-"}
+                                                                    </td>
+                                                                    <td className="px-6 py-4">{assignedQty}</td>
+                                                                    <td className="px-6 py-4">{cleanedQty}</td>
+                                                                </tr>
+                                                                <tr className="bg-gray-50/50 text-gray-900 font-semibold">
+                                                                    <td className="px-6 py-4">Total :</td>
+                                                                    <td className="px-6 py-4">{assignedQty}</td>
+                                                                    <td className="px-6 py-4">{cleanedQty}</td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
                                                     </div>
                                                 </div>
 
-                                                <div className="space-y-4">
-                                                    <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Payment Method</div>
-                                                    <div className="grid grid-cols-2 gap-3 mb-6">
-                                                        <button
-                                                            onClick={() => setPaymentMethod("Cash")}
-                                                            className={`flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 border ${paymentMethod === "Cash" ? 'bg-orange-50 border-orange-200 text-orange-700 ring-1 ring-orange-200' : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300 hover:bg-gray-50'}`}
-                                                        >
-                                                            <MdMoney className={`text-lg ${paymentMethod === "Cash" ? 'text-orange-600' : 'text-gray-400'}`} />
-                                                            Cash
-                                                        </button>
-                                                        <button
-                                                            onClick={() => setPaymentMethod("Online")}
-                                                            className={`flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 border ${paymentMethod === "Online" ? 'bg-orange-50 border-orange-200 text-orange-700 ring-1 ring-orange-200' : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300 hover:bg-gray-50'}`}
-                                                        >
-                                                            <MdOnlinePayment className={`text-lg ${paymentMethod === "Online" ? 'text-orange-600' : 'text-gray-400'}`} />
-                                                            Online
-                                                        </button>
-                                                    </div>
+                                                <div className="lg:w-1/3 flex flex-col justify-between p-6 bg-white rounded-xl border border-gray-200 shadow-sm">
+                                                    {/* Payment Success */}
+                                                    {paymentResult ? (
+                                                        <div className="text-center space-y-4">
+                                                            <div className="bg-green-50 w-16 h-16 rounded-full flex items-center justify-center mx-auto">
+                                                                <MdCheckCircle className="text-4xl text-green-500" />
+                                                            </div>
+                                                            <h3 className="text-xl font-bold text-gray-900">Payment Successful!</h3>
+                                                            <div className="space-y-2 text-sm">
+                                                                <div className="flex justify-between py-2 border-b border-gray-100">
+                                                                    <span className="text-gray-500">Amount</span>
+                                                                    <span className="font-bold text-green-600">₹{paymentResult.total}</span>
+                                                                </div>
+                                                                <div className="flex justify-between py-2 border-b border-gray-100">
+                                                                    <span className="text-gray-500">Method</span>
+                                                                    <span className="font-semibold">{paymentResult.method}</span>
+                                                                </div>
+                                                                <div className="flex justify-between py-2">
+                                                                    <span className="text-gray-500">Total Paid</span>
+                                                                    <span className="font-bold text-orange-600">₹{paymentResult.localTotalPaid}</span>
+                                                                </div>
+                                                            </div>
 
-                                                    <button className="w-full py-3.5 bg-green-600 text-white rounded-lg font-semibold text-base hover:bg-green-700 transition-colors shadow-sm flex items-center justify-center gap-2 active:bg-green-800">
-                                                        <MdCheckCircle className="text-xl" />
-                                                        Confirm & Pay
-                                                    </button>
+                                                            {/* Show QR for Online */}
+                                                            {paymentResult.method === "Online" && paymentResult.qr && (
+                                                                <div className="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                                                                    <p className="text-xs text-gray-500 mb-2 font-medium">Scan to Pay</p>
+                                                                    <img src={paymentResult.qr} alt="UPI QR Code" className="w-40 h-40 mx-auto rounded-lg" />
+                                                                    <p className="text-xs text-gray-600 mt-2 font-mono">{paymentResult.upiId}</p>
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    ) : orderData ? (
+                                                        <>
+                                                            {/* Order Reference */}
+                                                            <div className="flex justify-between items-center mb-8">
+                                                                <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Order Reference</span>
+                                                                <span className="px-2 py-1 bg-gray-100 rounded text-xs font-mono font-medium text-gray-600">
+                                                                    {orderData.orderReference?.slice(-6) || "—"}
+                                                                </span>
+                                                            </div>
+
+                                                            {/* Amount */}
+                                                            <div className="text-center mb-8 pb-8 border-b border-gray-100">
+                                                                <div className="text-gray-500 text-xs font-medium mb-2 uppercase tracking-wide">Amount to Pay</div>
+                                                                <div className="text-3xl font-bold text-gray-900 flex items-center justify-center gap-2">
+                                                                    <span>{orderData.quantity}</span>
+                                                                    <span className="text-gray-400 text-xl">×</span>
+                                                                    <span>{orderData.price_per_cleaned_imli}</span>
+                                                                    <span className="text-gray-400 text-xl">=</span>
+                                                                    <span className="text-orange-600">₹{orderData.total}</span>
+                                                                </div>
+                                                            </div>
+
+                                                            {/* Payment Method + Confirm */}
+                                                            <div className="space-y-4">
+                                                                <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Payment Method</div>
+                                                                <div className="grid grid-cols-2 gap-3 mb-6">
+                                                                    <button
+                                                                        onClick={() => setPaymentMethod("Cash")}
+                                                                        className={`flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 border ${paymentMethod === "Cash" ? 'bg-orange-50 border-orange-200 text-orange-700 ring-1 ring-orange-200' : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300 hover:bg-gray-50'}`}
+                                                                    >
+                                                                        <MdMoney className={`text-lg ${paymentMethod === "Cash" ? 'text-orange-600' : 'text-gray-400'}`} />
+                                                                        Cash
+                                                                    </button>
+                                                                    <button
+                                                                        onClick={() => setPaymentMethod("Online")}
+                                                                        className={`flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 border ${paymentMethod === "Online" ? 'bg-orange-50 border-orange-200 text-orange-700 ring-1 ring-orange-200' : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300 hover:bg-gray-50'}`}
+                                                                    >
+                                                                        <MdOnlinePayment className={`text-lg ${paymentMethod === "Online" ? 'text-orange-600' : 'text-gray-400'}`} />
+                                                                        Online
+                                                                    </button>
+                                                                </div>
+
+                                                                {/* Payment Error */}
+                                                                {paymentError && (
+                                                                    <div className="p-3 bg-red-50 border border-red-200 rounded-lg mb-3">
+                                                                        <p className="text-red-700 text-sm font-medium">{paymentError}</p>
+                                                                    </div>
+                                                                )}
+
+                                                                <button
+                                                                    onClick={() => handleConfirmPayment(local.LocalID)}
+                                                                    disabled={paymentLoading || !orderData.total}
+                                                                    className="w-full py-3.5 bg-green-600 text-white rounded-lg font-semibold text-base hover:bg-green-700 transition-colors shadow-sm flex items-center justify-center gap-2 active:bg-green-800 disabled:bg-gray-300 disabled:cursor-not-allowed"
+                                                                >
+                                                                    {paymentLoading ? (
+                                                                        <>
+                                                                            <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                                                                            Processing...
+                                                                        </>
+                                                                    ) : (
+                                                                        <>
+                                                                            <MdCheckCircle className="text-xl" />
+                                                                            Confirm & Pay ₹{orderData.total}
+                                                                        </>
+                                                                    )}
+                                                                </button>
+                                                            </div>
+                                                        </>
+                                                    ) : (
+                                                        <div className="text-center py-8 text-gray-400">
+                                                            <p className="font-medium">No pending payment</p>
+                                                        </div>
+                                                    )}
                                                 </div>
                                             </div>
-                                        </div>
+                                        )}
                                     </div>
                                 </div>
                             </div>

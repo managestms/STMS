@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { MdPersonAdd, MdCancel, MdCheckCircle, MdError, MdPerson, MdHome, MdPhone, MdPayment, MdSchedule } from 'react-icons/md'
 import api from "../../api/axios"
+import { t } from "../../i18n/translations"
 
 export default function AddLocals() {
     const [formData, setFormData] = useState({
@@ -10,7 +11,7 @@ export default function AddLocals() {
         LocalName: "",
         LocalAddress: "",
         LocalPhone: "",
-        LocalUPI: "",
+        upiId: "",
     })
 
     const [loading, setLoading] = useState(false)
@@ -34,19 +35,19 @@ export default function AddLocals() {
         try {
             const response = await api.post("/addLocal", formData)
 
-            setSuccessMessage("✅ Local added successfully to the system")
+            setSuccessMessage(` ${t("Local added successfully")}`)
             setFormData({
                 LocalID: "",
                 LocalName: "",
                 LocalAddress: "",
                 LocalPhone: "",
-                LocalUPI: "",
+                upiId: "",
             })
 
             console.log("Response:", response.data)
         } catch (error) {
             setErrorMessage(
-                error.response?.data?.message || "Failed to add local. Please try again."
+                error.response?.data?.message || t("Failed to add local. Please try again.")
             )
             console.error("Error:", error)
         } finally {
@@ -78,8 +79,8 @@ export default function AddLocals() {
                                     <MdPersonAdd className="text-2xl text-orange-600" />
                                 </div>
                                 <div>
-                                    <h1 className="text-2xl font-bold text-gray-900">Add Local</h1>
-                                    <p className="text-gray-500 text-sm font-medium">Register a new local worker</p>
+                                    <h1 className="text-2xl font-bold text-gray-900">{t("Add Local")}</h1>
+                                    <p className="text-gray-500 text-sm font-medium">{t("Register a new local worker")}</p>
                                 </div>
                             </div>
                             <div className="flex items-center gap-2 bg-gray-50 rounded-lg px-3 py-1.5 border border-gray-100">
@@ -116,14 +117,14 @@ export default function AddLocals() {
                                 <div className="relative">
                                     <label className="flex items-center gap-2 text-gray-700 font-semibold mb-2 text-sm uppercase tracking-wide">
                                         <MdPerson className="text-orange-500" />
-                                        Local ID
+                                        {t("Local ID")}
                                     </label>
                                     <input
                                         type="text"
                                         name="LocalID"
                                         value={formData.LocalID}
                                         onChange={handleChange}
-                                        placeholder="Enter unique local ID"
+                                        placeholder={t("Enter unique local ID")}
                                         className="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all duration-200 text-base font-medium"
                                         required
                                     />
@@ -132,14 +133,14 @@ export default function AddLocals() {
                                 <div className="relative">
                                     <label className="flex items-center gap-2 text-gray-700 font-semibold mb-2 text-sm uppercase tracking-wide">
                                         <MdPerson className="text-orange-500" />
-                                        Local Name
+                                        {t("Local Name")}
                                     </label>
                                     <input
                                         type="text"
                                         name="LocalName"
                                         value={formData.LocalName}
                                         onChange={handleChange}
-                                        placeholder="Enter full name"
+                                        placeholder={t("Enter full name")}
                                         className="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all duration-200 text-base font-medium"
                                         required
                                     />
@@ -149,14 +150,14 @@ export default function AddLocals() {
                             <div className="relative">
                                 <label className="flex items-center gap-2 text-gray-700 font-semibold mb-2 text-sm uppercase tracking-wide">
                                     <MdHome className="text-orange-500" />
-                                    Address
+                                    {t("Address")}
                                 </label>
                                 <input
                                     type="text"
                                     name="LocalAddress"
                                     value={formData.LocalAddress}
                                     onChange={handleChange}
-                                    placeholder="Enter complete address with landmarks"
+                                    placeholder={t("Enter complete address with landmarks")}
                                     className="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all duration-200 text-base font-medium"
                                     required
                                 />
@@ -166,14 +167,14 @@ export default function AddLocals() {
                                 <div className="relative">
                                     <label className="flex items-center gap-2 text-gray-700 font-semibold mb-2 text-sm uppercase tracking-wide">
                                         <MdPhone className="text-orange-500" />
-                                        Phone Number
+                                        {t("Phone Number")}
                                     </label>
                                     <input
                                         type="tel"
                                         name="LocalPhone"
                                         value={formData.LocalPhone}
                                         onChange={handleChange}
-                                        placeholder="Enter 10-digit mobile number"
+                                        placeholder={t("Enter 10-digit mobile number")}
                                         className="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all duration-200 text-base font-medium"
                                         required
                                     />
@@ -182,16 +183,15 @@ export default function AddLocals() {
                                 <div className="relative">
                                     <label className="flex items-center gap-2 text-gray-700 font-semibold mb-2 text-sm uppercase tracking-wide">
                                         <MdPayment className="text-orange-500" />
-                                        UPI ID
+                                        {t("UPI ID (Optional)")}
                                     </label>
                                     <input
                                         type="text"
-                                        name="LocalUPI"
-                                        value={formData.LocalUPI}
+                                        name="upiId"
+                                        value={formData.upiId}
                                         onChange={handleChange}
-                                        placeholder="username@upi or mobile@upi"
+                                        placeholder={t("username@upi or mobile@upi")}
                                         className="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all duration-200 text-base font-medium"
-                                        required
                                     />
                                 </div>
                             </div>
@@ -202,7 +202,7 @@ export default function AddLocals() {
                                     onClick={handleCancel}
                                     className="flex-1 px-4 py-2.5 bg-white border border-gray-300 rounded-lg font-medium text-gray-700 hover:bg-gray-50 hover:text-gray-900 transition-colors shadow-sm text-sm"
                                 >
-                                    Cancel
+                                    {t("Cancel")}
                                 </button>
                                 <button
                                     type="submit"
@@ -212,12 +212,12 @@ export default function AddLocals() {
                                     {loading ? (
                                         <>
                                             <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                                            Adding Local...
+                                            {t("Adding Local...")}
                                         </>
                                     ) : (
                                         <>
                                             <MdPersonAdd className="text-lg" />
-                                            Add Local
+                                            {t("Add Local")}
                                         </>
                                     )}
                                 </button>

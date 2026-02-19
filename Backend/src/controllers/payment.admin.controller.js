@@ -1,5 +1,4 @@
 import { Payment } from "../models/payment.model.js";
-import { generateQRCode } from "../service/qrGenerator.service.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { ApiError } from "../utils/ApiError.js";
@@ -7,26 +6,6 @@ import { Config } from "../models/config.model.js"
 import { imliReturn } from "../models/imliReturn.model.js"
 import { ImliAssign } from "../models/imliAssign.model.js"
 import { localData } from "../models/local.model.js"
-
-export const qrHandler = asyncHandler(async (req, res) => {
-    const { upiId } = req.body;
-
-    if (!upiId) throw new ApiError(400, "upiId is required");
-
-    const existing = await Payment.findOne({ upiId });
-    if (existing) {
-        return res.status(200).json(
-            new ApiResponse(200, { qr: existing.upiQrCode }, "QR already exists")
-        );
-    }
-
-    const qr = await generateQRCode(upiId);
-
-    await Payment.create({ upiId, upiQrCode: qr });
-    return res.status(201).json(
-        new ApiResponse(201, { qr }, "QR generated successfully")
-    );
-});
 
 
 export const Imli_price_changer = asyncHandler(async (req, res) => {
@@ -48,8 +27,8 @@ export const orderReference = asyncHandler(async (req, res) => {
 
     if (!localID) throw new ApiError(400, "localID required");
 
-    const r = await imliReturn.findOne({ localID });
-    if (!r) throw new ApiError(404, "Return record not found");
+    const r = await imliReturn.findOne({ localID, returnedQuantity: { $gt: 0 } });
+    if (!r) throw new ApiError(404, "No pending return record found");
 
     const p = await Config.findOne();
     if (!p) throw new ApiError(404, "Price config not found");
@@ -71,8 +50,8 @@ export const confirmPayment = asyncHandler(async (req, res) => {
 
     if (!localId || !method) throw new ApiError(400, "localId and method are required");
 
-    const r = await imliReturn.findOne({ localID: localId });
-    if (!r) throw new ApiError(404, "Return record not found");
+    const r = await imliReturn.findOne({ localID: localId, returnedQuantity: { $gt: 0 } });
+    if (!r) throw new ApiError(404, "No pending return record found");
 
     const p = await Config.findOne();
     if (!p) throw new ApiError(404, "Price config not found");
@@ -81,20 +60,21 @@ export const confirmPayment = asyncHandler(async (req, res) => {
     if (!local) throw new ApiError(404, "Local not found");
 
     const total = r.returnedQuantity * p.price_per_cleaned_imli;
-    let localtotal = 0;
-    localtotal += total;
+    // localTotalPaid = is local ko ab tak total kitna paid hua (existing + is baar ka)
+    const localTotalPaid = local.totalPaidAmount + total;
 
     if (method === "Cash") {
         try {
             await Payment.create({
                 local: local._id,
+                localID: localId,
                 method,
                 amount: total
             });
 
             await localData.findOneAndUpdate(
                 { LocalID: localId },
-                { $inc: { totalPaidAmount: localtotal } }
+                { $inc: { totalPaidAmount: total } }
             );
 
             await ImliAssign.findOneAndUpdate(
@@ -103,7 +83,7 @@ export const confirmPayment = asyncHandler(async (req, res) => {
             );
 
             await imliReturn.findOneAndUpdate(
-                { localID: localId },
+                { _id: r._id },
                 { $inc: { returnedQuantity: -r.returnedQuantity } }
             );
 
@@ -111,6 +91,7 @@ export const confirmPayment = asyncHandler(async (req, res) => {
                 new ApiResponse(201, {
                     orderReference: r._id,
                     total,
+                    localTotalPaid,
                     method,
                 }, "Payment successful")
             );
@@ -121,22 +102,38 @@ export const confirmPayment = asyncHandler(async (req, res) => {
 
     if (method === "Online") {
         try {
-            const paymentRecord = await Payment.findOne({ upiId: { $ne: "" } });
-            if (!paymentRecord) throw new ApiError(404, "UPI not configured by admin");
+            if (!local.upiId || !local.upiQrCode) throw new ApiError(404, "UPI not configured for this local");
 
             await Payment.create({
                 local: local._id,
+                localID: localId,
                 method,
                 amount: total
             });
+
+            await localData.findOneAndUpdate(
+                { LocalID: localId },
+                { $inc: { totalPaidAmount: total } }
+            );
+
+            await ImliAssign.findOneAndUpdate(
+                { localID: localId },
+                { $inc: { assignedQuantity: -r.returnedQuantity } }
+            );
+
+            await imliReturn.findOneAndUpdate(
+                { _id: r._id },
+                { $inc: { returnedQuantity: -r.returnedQuantity } }
+            );
 
             return res.status(200).json(
                 new ApiResponse(200, {
                     orderReference: r._id,
                     total,
+                    localTotalPaid,
                     method,
-                    upiId: paymentRecord.upiId,
-                    qr: paymentRecord.upiQrCode,
+                    upiId: local.upiId,
+                    qr: local.upiQrCode,
                 }, "Scan QR to pay")
             );
         } catch (err) {

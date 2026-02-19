@@ -10,8 +10,7 @@ const localSchema = new Schema(
     },
 
     LocalName: {
-      type: String,
-      required: true,
+      type: String
     },
 
     LocalAddress: {
@@ -32,6 +31,16 @@ const localSchema = new Schema(
     totalReturnedQuantity: {
       type: Number,
       default: 0,
+    },
+
+    upiId: {
+      type: String,
+      default: "",
+    },
+
+    upiQrCode: {
+      type: String,
+      default: "",
     },
 
     totalPaidAmount: {

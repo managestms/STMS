@@ -16,16 +16,6 @@ const paymentSchema = new Schema(
       enum: ["Cash", "Online"],
     },
 
-    upiId: {
-      type: String,
-      default: "",
-    },
-
-    upiQrCode: {
-      type: String,
-      default: "",
-    },
-
     amount: {
       type: Number,
       default: 0,
