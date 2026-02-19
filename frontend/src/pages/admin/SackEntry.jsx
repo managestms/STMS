@@ -12,7 +12,7 @@ const SackEntryColumn = () => {
     React.useEffect(() => {
         const fetchLocals = async () => {
             try {
-                const response = await api.post("/getlocalData");
+                const response = await api.post("/return_local");
                 if (response.data && response.data.data) {
                     setAllLocals(response.data.data);
                 }

@@ -21,7 +21,7 @@ const LocalsProfile = ({ navigateToAssignImli }) => {
     try {
       setLoading(true)
       setError(null)
-      const response = await axios.post("http://localhost:8000/api/getlocalData")
+      const response = await axios.post("http://localhost:8000/api/return_local")
       if (response.data.data) {
         setLocals(response.data.data)
         setFilteredLocals(response.data.data)

@@ -21,7 +21,7 @@ const AssignImli = ({ prefilledLocalId, prefilledLocal }) => {
   useEffect(() => {
     const fetchLocals = async () => {
       try {
-        const response = await api.post("/getlocalData")
+        const response = await api.post("/return_local")
         console.log("Locals response:", response.data) // Debug log
         if (response.data && response.data.data) {
           setAllLocals(response.data.data)

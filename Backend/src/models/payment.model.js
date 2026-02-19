@@ -4,19 +4,12 @@ const paymentSchema = new Schema(
   {
     local: {
       type: Schema.Types.ObjectId,
-      ref: "Local",
-      required: true,
+      ref: "localData",
     },
 
     method: {
       type: String,
       enum: ["UPI", "CASH"],
-      required: true,
-    },
-
-    price_per_cleand_imli:{
-        type:String,
-        require:true
     },
 
     upiId: {
@@ -31,17 +24,10 @@ const paymentSchema = new Schema(
 
     amount: {
       type: Number,
-      required: true,
-    },
-
-    status: {
-      type: String,
-      enum: ["PENDING", "SUCCESS", "FAILED"],
-      default: "PENDING",
-    },
+      default: 0,
+    }
   },
   { timestamps: true }
 );
 
 export const Payment = mongoose.model("Payment", paymentSchema);
-
