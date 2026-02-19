@@ -7,9 +7,13 @@ const paymentSchema = new Schema(
       ref: "localData",
     },
 
+    localID: {
+      type: Number,
+    },
+
     method: {
       type: String,
-      enum: ["UPI", "CASH"],
+      enum: ["Cash", "Online"],
     },
 
     upiId: {
@@ -25,7 +29,13 @@ const paymentSchema = new Schema(
     amount: {
       type: Number,
       default: 0,
-    }
+    },
+
+    status: {
+      type: String,
+      enum: ["PENDING", "SUCCESS", "FAILED"],
+      default: "PENDING",
+    },
   },
   { timestamps: true }
 );

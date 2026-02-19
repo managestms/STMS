@@ -27,17 +27,17 @@ export const returnImli = asyncHandler(async (req, res) => {
     );
   }
 
-  // 4️⃣ Decrease totalAssignedQuantity from Local
+  // Decrease totalAssignedQuantity from Local
   const updatedLocal = await localData.findOneAndUpdate(
     { LocalID },
     { $inc: { totalAssignedQuantity: -returnedQuantity } },
-    { new: true }
+    { returnDocument: 'after' }
   );
 
   const totalReturnedQuantity = await localData.findOneAndUpdate(
     { LocalID },
     { $inc: { totalReturnedQuantity: returnedQuantity } },
-    { new: true }
+    { returnDocument: 'after' }
   );
 
   const returned = await imliReturn.create({
