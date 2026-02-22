@@ -42,6 +42,9 @@ app.use("/api", localRoutes);
 import invoiceRoutes from "./route/invoice.route.js"
 app.use("/api",invoiceRoutes)
 
+import settingsRoutes from "./route/setting.route.js";
+app.use("/api", settingsRoutes);
+
 
 // Global error handler — converts ApiError to JSON response
 app.use((err, req, res, next) => {

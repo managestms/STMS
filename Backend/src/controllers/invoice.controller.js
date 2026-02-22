@@ -5,11 +5,20 @@ import { ApiError } from "../utils/ApiError.js";
 import currency from "currency.js";
 import numberToWords from "number-to-words";
 import generatePdf from "../utils/generatePdf.js";
+import Settings from "../models/settings.model.js";
 
 // CREATE INVOICE
 export const createInvoice = asyncHandler(async (req, res) => {
-  const { seller, customer, items, transport } = req.body;
+  const { customer, items, transport } = req.body;
 
+  // fetch seller from DB
+  const settings = await Settings.findOne();
+
+  if (!settings || !settings.seller) {
+    throw new ApiError(400, "Please configure business settings first");
+  }
+
+  const seller = settings.seller;
   if (!seller || !customer || !items?.length) {
     throw new ApiError(400, "Missing invoice data");
   }
