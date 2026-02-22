@@ -90,16 +90,48 @@ function Billing() {
     }
 
     try {
-      const response = await api.post("/generate-invoice", payload)
+      const response = await api.post("/generateInvoice", payload, {
+        responseType: "blob", // Important: receive PDF as binary blob
+      })
+
+      // Extract filename from Content-Disposition header, fallback to default
+      const contentDisposition = response.headers["content-disposition"]
+      let filename = "invoice.pdf"
+      if (contentDisposition) {
+        const match = contentDisposition.match(/filename=(.+?)($|;)/)
+        if (match) filename = match[1].replace(/"/g, "")
+      }
+
+      // Create a blob URL and trigger download
+      const blob = new Blob([response.data], { type: "application/pdf" })
+      const url = window.URL.createObjectURL(blob)
+      const link = document.createElement("a")
+      link.href = url
+      link.download = filename
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      window.URL.revokeObjectURL(url)
+
       setSubmitResult({
         success: true,
-        message: "Invoice generated successfully!",
-        data: response.data,
+        message: "Invoice generated and downloaded successfully!",
       })
     } catch (error) {
+      // When responseType is blob, error response is also a blob — parse it
+      let errorMessage = "Failed to generate invoice. Please try again."
+      if (error.response?.data instanceof Blob) {
+        try {
+          const text = await error.response.data.text()
+          const json = JSON.parse(text)
+          errorMessage = json.message || errorMessage
+        } catch { }
+      } else {
+        errorMessage = error.response?.data?.message || errorMessage
+      }
       setSubmitResult({
         success: false,
-        message: error.response?.data?.message || "Failed to generate invoice. Please try again.",
+        message: errorMessage,
       })
     } finally {
       setIsSubmitting(false)
@@ -183,10 +215,10 @@ function Billing() {
                     <div className="flex flex-col items-center">
                       <div
                         className={`w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-300 ${isCompleted
-                            ? "bg-orange-500 text-white shadow-sm"
-                            : isActive
-                              ? "bg-orange-500 text-white ring-4 ring-orange-500/20 shadow-md"
-                              : "bg-gray-100 text-gray-400 border-2 border-gray-200"
+                          ? "bg-orange-500 text-white shadow-sm"
+                          : isActive
+                            ? "bg-orange-500 text-white ring-4 ring-orange-500/20 shadow-md"
+                            : "bg-gray-100 text-gray-400 border-2 border-gray-200"
                           }`}
                       >
                         {isCompleted ? (
