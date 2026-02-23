@@ -194,6 +194,12 @@ const translations = {
     "Local Details": "مقامی تفصیلات",
     "Transaction History": "لین دین کی تاریخ",
     "No transactions found": "کوئی لین دین نہیں ملا",
+
+    // ─── Settings ───
+    "Price updated successfully": "قیمت کامیابی سے اپ ڈیٹ ہو گئی",
+    "Update Price": "قیمت اپ ڈیٹ کریں",
+    "Please enter a valid price": "براہ کرم درست قیمت درج کریں",
+    "Failed to update price. Please try again.": "قیمت اپ ڈیٹ کرنے میں ناکامی۔ دوبارہ کوشش کریں۔",
 };
 
 /**
