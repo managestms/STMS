@@ -11,11 +11,12 @@ import AddLocals from "./AddLocals"
 import LocalsProfile from "./LocalsProfile"
 import Payment from "./Payment"
 import Billing from "./Billing"
+import Settings from "./Settings"
 
 const AdminLayout = () => {
   const [activePage, setActivePage] = useState("dashboard")
   const [navigationProps, setNavigationProps] = useState({})
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(true) // Start collapsed
+  const [isSidebarCollapsed] = useState(false) // Always expanded
 
   const navigateToAssignImli = (localData) => {
     setNavigationProps({ prefilledLocalId: localData.LocalID, prefilledLocal: localData })
@@ -27,10 +28,6 @@ const AdminLayout = () => {
     setActivePage(pageId)
   }
 
-  const toggleSidebar = () => {
-    setIsSidebarCollapsed(!isSidebarCollapsed)
-  }
-
   const pageConfig = {
     dashboard: { component: Dashboard, title: "DASHBOARD GENERAL", props: { navigateToAssignImli, onPageChange: handlePageChange } },
     addLocals: { component: AddLocals, title: "ADD LOCALS", props: {} },
@@ -40,6 +37,7 @@ const AdminLayout = () => {
     localsProfile: { component: LocalsProfile, title: "LOCALS PROFILE", props: { navigateToAssignImli } },
     payment: { component: Payment, title: "PAYMENT", props: {} },
     billing: { component: Billing, title: "BILLING", props: {} },
+    settings: { component: Settings, title: "SETTINGS", props: {} },
   }
 
   const currentPage = pageConfig[activePage]
@@ -51,7 +49,6 @@ const AdminLayout = () => {
         activePage={activePage}
         onPageChange={handlePageChange}
         isCollapsed={isSidebarCollapsed}
-        onToggle={toggleSidebar}
       />
       <div className="flex-1 flex flex-col min-w-0">
         <Header
