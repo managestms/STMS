@@ -421,7 +421,30 @@ const Payment = () => {
                                                                         <MdError className="text-4xl text-red-500" />
                                                                     </div>
                                                                     <h3 className="text-xl font-bold text-gray-900">Payment Rejected</h3>
-                                                                    <p className="text-gray-500 text-sm">No deductions were made</p>
+                                                                    <div className="space-y-2 text-sm">
+                                                                        <div className="flex justify-between py-2 border-b border-gray-100">
+                                                                            <span className="text-gray-500">Amount</span>
+                                                                            <span className="font-bold text-red-600">₹{orderData?.total || "—"}</span>
+                                                                        </div>
+                                                                        <div className="flex justify-between py-2 border-b border-gray-100">
+                                                                            <span className="text-gray-500">Method</span>
+                                                                            <span className="font-semibold">{paymentResult.method}</span>
+                                                                        </div>
+                                                                        <div className="flex justify-between py-2 border-b border-gray-100">
+                                                                            <span className="text-gray-500">Status</span>
+                                                                            <span className="font-bold text-red-600">REJECTED</span>
+                                                                        </div>
+                                                                        <div className="flex justify-between py-2">
+                                                                            <span className="text-gray-500">Deduction</span>
+                                                                            <span className="font-semibold text-gray-700">No amount deducted</span>
+                                                                        </div>
+                                                                    </div>
+                                                                    <button
+                                                                        onClick={() => { setPaymentResult(null); setPaymentError(null); fetchOrderReference(local.LocalID); }}
+                                                                        className="w-full mt-2 py-3 bg-orange-500 text-white rounded-lg font-semibold hover:bg-orange-600 transition-colors shadow-sm"
+                                                                    >
+                                                                        Retry Payment
+                                                                    </button>
                                                                 </>
                                                             )}
                                                         </div>

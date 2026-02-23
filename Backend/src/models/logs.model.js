@@ -8,11 +8,10 @@ const paymentLogSchema = new mongoose.Schema({
     },
 
     LocalID: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "LocalData",
+        type: Number,
         required: true
     },
-    
+
     period: {
         type: Date,
         required: true,
@@ -52,11 +51,11 @@ const paymentLogSchema = new mongoose.Schema({
     paymentStatus: {
         type: String,
         enum: ["PENDING", "SUCCESS", "FAILED"],
-       default: "PENDING",
+        default: "PENDING",
     },
 
     notes: String
 
 }, { timestamps: true });
 
-export const logs = mongoose.model("PaymentLog",  paymentLogSchema);
+export const logs = mongoose.model("PaymentLog", paymentLogSchema);
