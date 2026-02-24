@@ -1,7 +1,16 @@
 import axios from "axios"
 
+// ─── Base URLs ────────────────────────────────────────────────────────────────
+const LOCAL_URL = "http://localhost:8000/api"       // local development
+const NETWORK_URL = "http://10.101.36.1:8000/api"    // LAN / network access
+
+// Switch between LOCAL_URL and NETWORK_URL as needed
+const BASE_URL = LOCAL_URL
+
+// ─────────────────────────────────────────────────────────────────────────────
+
 const api = axios.create({
-  baseURL: "http://10.76.145.1:8000/api",
+  baseURL: BASE_URL,
   withCredentials: true, // cookies ke liye IMPORTANT
 })
 
