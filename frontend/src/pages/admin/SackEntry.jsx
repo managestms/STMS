@@ -79,18 +79,18 @@ const SackEntryColumn = ({
     lang
 }) => {
     return (
-        <div className="bg-white rounded-xl border border-gray-200 flex flex-col h-full shadow-sm overflow-hidden">
+        <div className="bg-white rounded-lg md:rounded-xl border border-gray-200 flex flex-col h-full shadow-sm overflow-hidden">
             {/* Header */}
-            <div className="flex items-center px-4 py-3 bg-gray-50 border-b border-gray-200">
-                <div className="flex-1 text-xs font-bold text-gray-500 uppercase tracking-wider pl-1"><T k="ID / NAME" /></div>
-                <div className="flex-1 text-xs font-bold text-gray-500 uppercase tracking-wider text-right pr-4"><T k="QUANTITY" /></div>
-                <div className="w-[100px] flex flex-col items-center justify-center border-l border-gray-200 pl-2">
-                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1"><T k="DELIVERED" /></span>
+            <div className="flex items-center px-3 md:px-4 py-2 md:py-3 bg-gray-50 border-b border-gray-200">
+                <div className="flex-1 text-[10px] md:text-xs font-bold text-gray-500 uppercase tracking-wider pl-1"><T k="ID / NAME" /></div>
+                <div className="flex-1 text-[10px] md:text-xs font-bold text-gray-500 uppercase tracking-wider text-right pr-2 md:pr-4"><T k="QUANTITY" /></div>
+                <div className="w-[60px] md:w-[100px] flex flex-col items-center justify-center border-l border-gray-200 pl-1 md:pl-2">
+                    <span className="text-[8px] md:text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-0.5 md:mb-1 hidden md:block"><T k="DELIVERED" /></span>
                     <input
                         type="checkbox"
                         checked={allDelivered}
                         onChange={toggleAllDelivered}
-                        className="w-4 h-4 text-orange-600 rounded border-gray-300 focus:ring-orange-500 cursor-pointer transition-transform hover:scale-105"
+                        className="w-3.5 md:w-4 h-3.5 md:h-4 text-orange-600 rounded border-gray-300 focus:ring-orange-500 cursor-pointer transition-transform hover:scale-105"
                     />
                 </div>
             </div>
@@ -100,20 +100,20 @@ const SackEntryColumn = ({
                 {rows.map((row, index) => (
                     <div
                         key={index}
-                        className={`flex items-center px-4 py-3 border-b border-gray-100 last:border-0 hover:bg-gray-50/80 transition-colors duration-200 group ${row.delivered ? 'bg-orange-50/30' : ''}`}
+                        className={`flex items-center px-3 md:px-4 py-2 md:py-3 border-b border-gray-100 last:border-0 hover:bg-gray-50/80 transition-colors duration-200 group ${row.delivered ? 'bg-orange-50/30' : ''}`}
                     >
-                        <div className="flex-1 pr-3 relative local-search-container" ref={el => inputRefs.current[index] = el}>
-                            <div className="flex items-center gap-2">
+                        <div className="flex-1 pr-2 md:pr-3 relative local-search-container" ref={el => inputRefs.current[index] = el}>
+                            <div className="flex items-center gap-1.5 md:gap-2">
                                 <input
                                     type="text"
                                     value={row.localId}
                                     onChange={(e) => handleChange(index, 'localId', e.target.value)}
                                     onFocus={() => setActiveDropdown(index)}
-                                    className="w-20 bg-transparent border-b border-transparent focus:border-orange-500 outline-none text-sm font-medium text-gray-700 placeholder-gray-400 py-1 transition-all"
+                                    className="w-14 md:w-20 bg-transparent border-b border-transparent focus:border-orange-500 outline-none text-xs md:text-sm font-medium text-gray-700 placeholder-gray-400 py-0.5 md:py-1 transition-all"
                                     placeholder="Enter ID"
                                 />
                                 {row.localName && (
-                                    <span className="text-sm text-gray-500 truncate flex-1" title={row.localName}>
+                                    <span className="text-xs md:text-sm text-gray-500 truncate flex-1" title={row.localName}>
                                         {row.localName}
                                     </span>
                                 )}
@@ -133,8 +133,8 @@ const SackEntryColumn = ({
                                             }}
                                             className="px-3 py-2 hover:bg-orange-50 cursor-pointer border-b border-gray-50 last:border-0"
                                         >
-                                            <div className="text-sm font-medium text-gray-900">{local.LocalID}</div>
-                                            <div className="text-xs text-gray-500 truncate">{local.LocalName}</div>
+                                            <div className="text-xs md:text-sm font-medium text-gray-900">{local.LocalID}</div>
+                                            <div className="text-[10px] md:text-xs text-gray-500 truncate">{local.LocalName}</div>
                                         </div>
                                     ))
                                 ) : (
@@ -142,22 +142,22 @@ const SackEntryColumn = ({
                                 )}
                             </DropdownPortal>
                         </div>
-                        <div className="flex-1 pl-3 pr-4 border-l border-gray-100">
+                        <div className="flex-1 pl-2 md:pl-3 pr-2 md:pr-4 border-l border-gray-100">
                             <input
                                 ref={el => quantityInputRefs.current[index] = el}
                                 type="number"
                                 value={row.quantity}
                                 onChange={(e) => handleChange(index, 'quantity', e.target.value)}
-                                className="w-full bg-transparent border-b border-transparent focus:border-orange-500 outline-none text-sm font-medium text-gray-700 placeholder-gray-400 py-1 text-right transition-all"
+                                className="w-full bg-transparent border-b border-transparent focus:border-orange-500 outline-none text-xs md:text-sm font-medium text-gray-700 placeholder-gray-400 py-0.5 md:py-1 text-right transition-all"
                                 placeholder="0"
                             />
                         </div>
-                        <div className="w-[100px] flex items-center justify-center border-l border-gray-100 pl-2">
+                        <div className="w-[60px] md:w-[100px] flex items-center justify-center border-l border-gray-100 pl-1 md:pl-2">
                             <input
                                 type="checkbox"
                                 checked={row.delivered}
                                 onChange={() => toggleRowDelivered(index)}
-                                className="w-4 h-4 text-orange-600 rounded border-gray-300 focus:ring-orange-500 cursor-pointer transition-transform hover:scale-105"
+                                className="w-3.5 md:w-4 h-3.5 md:h-4 text-orange-600 rounded border-gray-300 focus:ring-orange-500 cursor-pointer transition-transform hover:scale-105"
                             />
                         </div>
                     </div>
@@ -165,15 +165,15 @@ const SackEntryColumn = ({
             </div>
 
             {/* Footer / Add Button */}
-            <div className="p-4 bg-gray-50 border-t border-gray-200">
+            <div className="p-2.5 md:p-4 bg-gray-50 border-t border-gray-200">
                 <button
                     onClick={addRow}
-                    className="w-full bg-white hover:bg-orange-50 text-gray-600 hover:text-orange-700 font-medium py-2.5 rounded-lg flex items-center justify-center gap-2 transition-all duration-300 border border-gray-300 hover:border-orange-200 shadow-sm hover:shadow-md"
+                    className="w-full bg-white hover:bg-orange-50 text-gray-600 hover:text-orange-700 font-medium py-2 md:py-2.5 rounded-lg flex items-center justify-center gap-2 transition-all duration-300 border border-gray-300 hover:border-orange-200 shadow-sm hover:shadow-md"
                 >
                     <div className="bg-gray-100 group-hover:bg-orange-100 p-1 rounded-full transition-colors">
-                        <MdAdd className="text-lg" />
+                        <MdAdd className="text-base md:text-lg" />
                     </div>
-                    <span className="text-sm"><T k="Add New Row" /></span>
+                    <span className="text-xs md:text-sm"><T k="Add New Row" /></span>
                 </button>
             </div>
         </div>
@@ -362,43 +362,43 @@ const SackEntry = () => {
     };
 
     return (
-        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200 h-full flex flex-col relative">
+        <div className="bg-white rounded-lg md:rounded-xl p-3 md:p-6 shadow-sm border border-gray-200 h-full flex flex-col relative">
             <Toaster position="top-center" />
-            <div className="flex items-center justify-between mb-6 shrink-0">
-                <div className="flex items-center gap-4">
-                    <h3 className="text-lg font-bold text-gray-900">
+            <div className="flex items-center justify-between mb-3 md:mb-6 shrink-0">
+                <div className="flex items-center gap-2 md:gap-4">
+                    <h3 className="text-sm md:text-lg font-bold text-gray-900">
                         <T k="Sack Entry" />
                     </h3>
                     {/* Date Navigation */}
-                    <div className="flex items-center bg-gray-100 rounded-full border border-gray-200 p-1">
+                    <div className="flex items-center bg-gray-100 rounded-full border border-gray-200 p-0.5 md:p-1">
                         <button
                             onClick={() => changeDate(-1)}
-                            className="p-1 hover:bg-white hover:shadow-sm rounded-full transition-all text-gray-500 hover:text-orange-600"
+                            className="p-0.5 md:p-1 hover:bg-white hover:shadow-sm rounded-full transition-all text-gray-500 hover:text-orange-600"
                         >
-                            <MdChevronLeft className="text-lg" />
+                            <MdChevronLeft className="text-base md:text-lg" />
                         </button>
-                        <span className="text-sm font-medium text-gray-700 px-3 min-w-[90px] text-center">
+                        <span className="text-[11px] md:text-sm font-medium text-gray-700 px-1.5 md:px-3 min-w-[70px] md:min-w-[90px] text-center">
                             {formattedDate}
                         </span>
                         <button
                             onClick={() => changeDate(1)}
                             disabled={!canGoNext}
-                            className={`p-1 rounded-full transition-all ${canGoNext
+                            className={`p-0.5 md:p-1 rounded-full transition-all ${canGoNext
                                 ? 'hover:bg-white hover:shadow-sm text-gray-500 hover:text-orange-600 cursor-pointer'
                                 : 'text-gray-300 cursor-not-allowed'
                                 }`}
                         >
-                            <MdChevronRight className="text-lg" />
+                            <MdChevronRight className="text-base md:text-lg" />
                         </button>
                     </div>
                 </div>
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2 md:gap-3">
                     <button
                         onClick={addRow}
-                        className="text-gray-500 hover:text-orange-600 p-1.5 hover:bg-orange-50 rounded-lg transition-all duration-200 flex items-center justify-center border border-transparent hover:border-orange-100"
+                        className="text-gray-500 hover:text-orange-600 p-1 md:p-1.5 hover:bg-orange-50 rounded-lg transition-all duration-200 flex items-center justify-center border border-transparent hover:border-orange-100"
                         title="Add New Row"
                     >
-                        <MdAdd className="text-xl" />
+                        <MdAdd className="text-lg md:text-xl" />
                     </button>
                 </div>
             </div>
