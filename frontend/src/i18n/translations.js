@@ -19,6 +19,12 @@ const translations = {
     "Locals Profile": "مقامی پروفائل",
     "Payment": "ادائیگی",
     "Settings": "ترتیبات",
+    "Business Settings": "کاروباری ترتیبات",
+    "Seller Details": "بیچنے والے کی تفصیلات",
+    "Business Name": "کاروبار کا نام",
+    "GSTIN": "جی ایس ٹی آئی این",
+    "State": "ریاست",
+    "State Code": "ریاستی کوڈ",
     "Logout": "لاگ آؤٹ",
 
     // ─── Quick Actions ───
@@ -81,6 +87,7 @@ const translations = {
     // ─── Messages ───
     "No data found": "کوئی ڈیٹا نہیں ملا",
     "Loading": "لوڈ ہو رہا ہے",
+    "Loading...": "لوڈ ہو رہا ہے...",
     "Error": "خرابی",
 
     // ─── Sack Entry ───
@@ -200,6 +207,12 @@ const translations = {
     "Update Price": "قیمت اپ ڈیٹ کریں",
     "Please enter a valid price": "براہ کرم درست قیمت درج کریں",
     "Failed to update price. Please try again.": "قیمت اپ ڈیٹ کرنے میں ناکامی۔ دوبارہ کوشش کریں۔",
+    "Business details updated successfully": "کاروبار کی تفصیلات کامیابی سے اپ ڈیٹ ہو گئیں۔",
+    "Failed to update business details": "کاروبار کی تفصیلات اپ ڈیٹ کرنے میں ناکامی",
+    "Update Business Details": "کاروبار کی تفصیلات اپ ڈیٹ کریں",
+    "Seller profile details": "فروش کی پروفائل تفصیلات",
+    "Pricing": "قیمت کا تعین",
+    "Business Profile": "کاروباری پروفائل",
 };
 
 /**

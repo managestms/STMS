@@ -20,6 +20,14 @@ export const Imli_price_changer = asyncHandler(async (req, res) => {
 
 });
 
+export const get_Imli_Price = asyncHandler(async (req, res) => {
+    const config = await Config.findOne();
+    return res.status(200).json(
+        new ApiResponse(200, { price: config?.price_per_cleaned_imli || 15 }, "Price fetched successfully")
+    );
+});
+
+
 export const orderReference = asyncHandler(async (req, res) => {
     const { localID } = req.body;
 
