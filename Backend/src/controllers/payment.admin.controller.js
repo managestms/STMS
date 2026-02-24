@@ -20,6 +20,14 @@ export const Imli_price_changer = asyncHandler(async (req, res) => {
 
 });
 
+export const get_Imli_Price = asyncHandler(async (req, res) => {
+    const config = await Config.findOne();
+    return res.status(200).json(
+        new ApiResponse(200, { price: config?.price_per_cleaned_imli || 15 }, "Price fetched successfully")
+    );
+});
+
+
 export const orderReference = asyncHandler(async (req, res) => {
     const { localID } = req.body;
 
@@ -202,4 +210,23 @@ export const confirmPayment = asyncHandler(async (req, res) => {
     }
 
     throw new ApiError(400, "Invalid method. Use Cash or Online");
+});
+
+
+export const logsdetails = asyncHandler(async (req, res) => {
+    const { localID } = req.body;
+
+    if (!localID) {
+        throw new ApiError(400, "localID is required");
+    }
+
+    const logDetails = await logs.find({ localID }).sort({ createdAt: -1 });
+
+    if (logDetails.length === 0) {
+        throw new ApiError(404, "No logs found for this localID");
+    }
+
+    return res.status(200).json(
+        new ApiResponse(200, logDetails, "Log details fetched")
+    );
 });
