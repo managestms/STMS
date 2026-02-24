@@ -98,35 +98,35 @@ const Dashboard = ({ navigateToAssignImli, onPageChange }) => {
 
 
   return (
-    <div className="p-6 lg:p-8 bg-gray-50 min-h-screen overflow-x-hidden">
+    <div className="p-3 md:p-6 lg:p-8 bg-gray-50 min-h-screen overflow-x-hidden">
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
+      <div className="grid grid-cols-2 md:grid-cols-2 xl:grid-cols-4 gap-2.5 md:gap-6 mb-4 md:mb-8">
         {stats.map((stat) => {
           const IconComponent = stat.icon;
           return (
             <div
               key={stat.id}
-              className={`bg-white rounded-xl p-6 shadow-sm border border-gray-100 border-l-4 ${stat.borderColor} hover:shadow-md transition-shadow duration-300`}
+              className={`bg-white rounded-lg md:rounded-xl p-3 md:p-6 shadow-sm border border-gray-100 border-l-4 ${stat.borderColor} hover:shadow-md transition-shadow duration-300`}
             >
-              <div className="flex items-start justify-between mb-4">
+              <div className="flex items-start justify-between mb-1.5 md:mb-4">
                 <div className="flex-1">
-                  <p className="text-gray-500 font-medium text-sm mb-1">
+                  <p className="text-gray-500 font-medium text-[11px] md:text-sm mb-0.5 md:mb-1 leading-tight">
                     {stat.title}
                   </p>
                 </div>
-                <div className={`${stat.iconBg} p-2.5 rounded-lg`}>
-                  <IconComponent className={`text-xl ${stat.iconColor}`} />
+                <div className={`${stat.iconBg} p-1.5 md:p-2.5 rounded-md md:rounded-lg`}>
+                  <IconComponent className={`text-sm md:text-xl ${stat.iconColor}`} />
                 </div>
               </div>
 
               <div className="flex items-end justify-between">
                 <div>
-                  <h3 className="text-2xl font-bold text-gray-900">
+                  <h3 className="text-base md:text-2xl font-bold text-gray-900">
                     {stat.value}
                   </h3>
                 </div>
                 <div className="text-right">
-                  <p className="urdu-ui text-xl font-bold text-gray-900 -mb-1">
+                  <p className="urdu-ui text-sm md:text-xl font-bold text-gray-900 -mb-1">
                     {stat.titleUrdu}
                   </p>
                 </div>
@@ -137,46 +137,46 @@ const Dashboard = ({ navigateToAssignImli, onPageChange }) => {
       </div>
 
       {/* Activities and Quick Actions */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 md:gap-6 mb-4 md:mb-8">
         {/* Sack Entry - Replaces 'Recent Activities' */}
         <div className="lg:col-span-2">
           <SackEntry />
         </div>
 
         {/* Quick Actions */}
-        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-          <h3 className="text-lg font-bold text-gray-900 mb-6">
+        <div className="bg-white rounded-lg md:rounded-xl p-4 md:p-6 shadow-sm border border-gray-200">
+          <h3 className="text-sm md:text-lg font-bold text-gray-900 mb-3 md:mb-6">
             <T k="Quick Actions" />
           </h3>
 
-          <div className="space-y-3">
+          <div className="space-y-2 md:space-y-3">
             <button
               onClick={() => onPageChange && onPageChange('addRawImli')}
-              className="w-full bg-orange-600 hover:bg-orange-700 text-white rounded-lg p-4 flex items-center justify-center gap-3 transition-colors shadow-sm"
+              className="w-full bg-orange-600 hover:bg-orange-700 text-white rounded-lg p-3 md:p-4 flex items-center justify-center gap-2 md:gap-3 transition-colors shadow-sm"
             >
-              <MdAdd className="text-xl" />
-              <span className="font-semibold text-sm"><T k="Add Raw Imli Stock" /></span>
+              <MdAdd className="text-lg md:text-xl" />
+              <span className="font-semibold text-xs md:text-sm"><T k="Add Raw Imli Stock" /></span>
             </button>
 
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 gap-2 md:gap-3">
               <button
                 onClick={() => onPageChange && onPageChange('assignImli')}
-                className="bg-white border border-gray-200 hover:bg-gray-50 hover:border-gray-300 text-gray-700 rounded-lg p-4 flex flex-col items-center justify-center gap-2 transition-all shadow-sm group"
+                className="bg-white border border-gray-200 hover:bg-gray-50 hover:border-gray-300 text-gray-700 rounded-lg p-3 md:p-4 flex flex-col items-center justify-center gap-1.5 md:gap-2 transition-all shadow-sm group"
               >
-                <div className="bg-purple-50 p-2 rounded-lg group-hover:bg-purple-100 transition-colors">
-                  <MdSettings className="text-purple-600 text-lg" />
+                <div className="bg-purple-50 p-1.5 md:p-2 rounded-lg group-hover:bg-purple-100 transition-colors">
+                  <MdSettings className="text-purple-600 text-sm md:text-lg" />
                 </div>
-                <span className="text-xs font-semibold"><T k="Assign Imli" /></span>
+                <span className="text-[10px] md:text-xs font-semibold"><T k="Assign Imli" /></span>
               </button>
 
               <button
                 onClick={() => onPageChange && onPageChange('imliReturned')}
-                className="bg-white border border-gray-200 hover:bg-gray-50 hover:border-gray-300 text-gray-700 rounded-lg p-4 flex flex-col items-center justify-center gap-2 transition-all shadow-sm group"
+                className="bg-white border border-gray-200 hover:bg-gray-50 hover:border-gray-300 text-gray-700 rounded-lg p-3 md:p-4 flex flex-col items-center justify-center gap-1.5 md:gap-2 transition-all shadow-sm group"
               >
-                <div className="bg-green-50 p-2 rounded-lg group-hover:bg-green-100 transition-colors">
-                  <MdInventory className="text-green-600 text-lg" />
+                <div className="bg-green-50 p-1.5 md:p-2 rounded-lg group-hover:bg-green-100 transition-colors">
+                  <MdInventory className="text-green-600 text-sm md:text-lg" />
                 </div>
-                <span className="text-xs font-semibold"><T k="Imli Cleaned" /></span>
+                <span className="text-[10px] md:text-xs font-semibold"><T k="Imli Cleaned" /></span>
               </button>
             </div>
           </div>

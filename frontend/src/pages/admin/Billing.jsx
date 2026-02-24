@@ -7,9 +7,12 @@ import CustomerDetails from "../../components/billing/CustomerDetails"
 import ItemDetails from "../../components/billing/ItemDetails"
 import TransportDetails from "../../components/billing/TransportDetails"
 import ReviewSubmit from "../../components/billing/ReviewSubmit"
+import CleanedImliForm from "../../components/billing/CleanedImliForm"
+import CleanedImliPreview from "../../components/billing/CleanedImliPreview"
 import api from "../../api/axios"
 
-const STEPS = [
+// Steps for Tamarind Seeds (existing 5-step flow)
+const TAMARIND_STEPS = [
   { id: 1, label: "Product" },
   { id: 2, label: "Customer" },
   { id: 3, label: "Items" },
@@ -17,11 +20,21 @@ const STEPS = [
   { id: 5, label: "Review" },
 ]
 
+// Steps for Cleaned Imli (new 2-step flow)
+const IMLI_STEPS = [
+  { id: 1, label: "Product" },
+  { id: 2, label: "Form" },
+  { id: 3, label: "Preview" },
+]
+
+const EMPTY_ROW = { product: "", quantity: "", unit: "", weight: "", amount: "" }
+
 function Billing() {
   const [currentStep, setCurrentStep] = useState(1)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitResult, setSubmitResult] = useState(null) // { success, message }
 
+  // Tamarind Seeds form data (existing)
   const [formData, setFormData] = useState({
     productType: "",
     description: "",
@@ -49,18 +62,28 @@ function Billing() {
     },
   })
 
+  // Cleaned Imli form data (new)
+  const [imliData, setImliData] = useState({
+    senderName: "",
+    rows: [{ ...EMPTY_ROW }, { ...EMPTY_ROW }],
+  })
+
+  const isImli = formData.productType === "cleaned_imli"
+  const STEPS = isImli ? IMLI_STEPS : TAMARIND_STEPS
+  const maxStep = STEPS.length
+
   const updateFormData = (updates) => {
     setFormData((prev) => ({ ...prev, ...updates }))
   }
 
-  const goNext = () => setCurrentStep((s) => Math.min(s + 1, 5))
+  const goNext = () => setCurrentStep((s) => Math.min(s + 1, maxStep))
   const goBack = () => setCurrentStep((s) => Math.max(s - 1, 1))
 
+  // Tamarind Seeds submit (existing)
   const handleSubmit = async () => {
     setIsSubmitting(true)
     setSubmitResult(null)
 
-    // Build the payload matching the backend schema
     const payload = {
       customer: formData.customer,
       transport: formData.transport,
@@ -91,10 +114,9 @@ function Billing() {
 
     try {
       const response = await api.post("/generateInvoice", payload, {
-        responseType: "blob", // Important: receive PDF as binary blob
+        responseType: "blob",
       })
 
-      // Extract filename from Content-Disposition header, fallback to default
       const contentDisposition = response.headers["content-disposition"]
       let filename = "invoice.pdf"
       if (contentDisposition) {
@@ -102,7 +124,6 @@ function Billing() {
         if (match) filename = match[1].replace(/"/g, "")
       }
 
-      // Create a blob URL and trigger download
       const blob = new Blob([response.data], { type: "application/pdf" })
       const url = window.URL.createObjectURL(blob)
       const link = document.createElement("a")
@@ -118,8 +139,76 @@ function Billing() {
         message: "Invoice generated and downloaded successfully!",
       })
     } catch (error) {
-      // When responseType is blob, error response is also a blob — parse it
       let errorMessage = "Failed to generate invoice. Please try again."
+      if (error.response?.data instanceof Blob) {
+        try {
+          const text = await error.response.data.text()
+          const json = JSON.parse(text)
+          errorMessage = json.message || errorMessage
+        } catch { }
+      } else {
+        errorMessage = error.response?.data?.message || errorMessage
+      }
+      setSubmitResult({
+        success: false,
+        message: errorMessage,
+      })
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  // Cleaned Imli submit (new - placeholder, backend URL will be given later)
+  const handleImliSubmit = async () => {
+    setIsSubmitting(true)
+    setSubmitResult(null)
+
+    const totalWeight = imliData.rows.reduce((sum, r) => sum + (parseFloat(r.weight) || 0), 0)
+    const totalAmount = imliData.rows.reduce((sum, r) => sum + (parseFloat(r.amount) || 0), 0)
+
+    const payload = {
+      senderName: imliData.senderName,
+      productType: "cleaned_imli",
+      items: imliData.rows.map((row) => ({
+        product: row.product,
+        quantity: parseFloat(row.quantity) || 0,
+        unit: row.unit,
+        weight: parseFloat(row.weight) || 0,
+        amount: parseFloat(row.amount) || 0,
+      })),
+      totalWeight,
+      totalAmount,
+    }
+
+    try {
+      // TODO: Replace with actual backend URL when ready
+      const response = await api.post("/generateImliInvoice", payload, {
+        responseType: "blob",
+      })
+
+      const contentDisposition = response.headers["content-disposition"]
+      let filename = "imli-bill.pdf"
+      if (contentDisposition) {
+        const match = contentDisposition.match(/filename=(.+?)($|;)/)
+        if (match) filename = match[1].replace(/"/g, "")
+      }
+
+      const blob = new Blob([response.data], { type: "application/pdf" })
+      const url = window.URL.createObjectURL(blob)
+      const link = document.createElement("a")
+      link.href = url
+      link.download = filename
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      window.URL.revokeObjectURL(url)
+
+      setSubmitResult({
+        success: true,
+        message: "Bill generated and downloaded successfully!",
+      })
+    } catch (error) {
+      let errorMessage = "Failed to generate bill. Please try again."
       if (error.response?.data instanceof Blob) {
         try {
           const text = await error.response.data.text()
@@ -149,6 +238,10 @@ function Billing() {
       item: { quantity: "", unit: "", rate: "", amount: 0, gstPercent: "", igst: 0, cgst: 0, sgst: 0 },
       transport: { destination: "", vehicleNo: "" },
     })
+    setImliData({
+      senderName: "",
+      rows: [{ ...EMPTY_ROW }, { ...EMPTY_ROW }],
+    })
   }
 
   // Success / Error screen
@@ -162,7 +255,9 @@ function Billing() {
                 <div className="bg-green-50 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 border-2 border-green-200">
                   <MdCheckCircle className="text-4xl text-green-500" />
                 </div>
-                <h2 className="text-2xl font-bold text-gray-900 mb-3">Invoice Generated!</h2>
+                <h2 className="text-2xl font-bold text-gray-900 mb-3">
+                  {isImli ? "Bill Generated!" : "Invoice Generated!"}
+                </h2>
                 <p className="text-gray-600 mb-8">{submitResult.message}</p>
               </>
             ) : (
@@ -179,7 +274,7 @@ function Billing() {
                 onClick={handleReset}
                 className="px-8 py-3 bg-orange-600 text-white rounded-xl font-semibold hover:bg-orange-700 transition-all duration-200 shadow-sm"
               >
-                Create New Invoice
+                Create New {isImli ? "Bill" : "Invoice"}
               </button>
             </div>
           </div>
@@ -199,8 +294,12 @@ function Billing() {
                 <MdReceipt className="text-2xl text-orange-600" />
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">Generate Invoice</h1>
-                <p className="text-gray-500 text-sm font-medium">Create a new tax invoice</p>
+                <h1 className="text-2xl font-bold text-gray-900">
+                  {isImli ? "Generate Bill" : "Generate Invoice"}
+                </h1>
+                <p className="text-gray-500 text-sm font-medium">
+                  {isImli ? "Create a new cleaned imli bill" : "Create a new tax invoice"}
+                </p>
               </div>
             </div>
 
@@ -252,6 +351,7 @@ function Billing() {
 
           {/* Step Content */}
           <div className="p-8">
+            {/* Step 1 is always Product Select */}
             {currentStep === 1 && (
               <ProductSelect
                 formData={formData}
@@ -259,7 +359,9 @@ function Billing() {
                 onNext={goNext}
               />
             )}
-            {currentStep === 2 && (
+
+            {/* ---- TAMARIND SEEDS FLOW (steps 2-5) ---- */}
+            {!isImli && currentStep === 2 && (
               <CustomerDetails
                 formData={formData}
                 updateFormData={updateFormData}
@@ -267,7 +369,7 @@ function Billing() {
                 onBack={goBack}
               />
             )}
-            {currentStep === 3 && (
+            {!isImli && currentStep === 3 && (
               <ItemDetails
                 formData={formData}
                 updateFormData={updateFormData}
@@ -275,7 +377,7 @@ function Billing() {
                 onBack={goBack}
               />
             )}
-            {currentStep === 4 && (
+            {!isImli && currentStep === 4 && (
               <TransportDetails
                 formData={formData}
                 updateFormData={updateFormData}
@@ -283,11 +385,29 @@ function Billing() {
                 onBack={goBack}
               />
             )}
-            {currentStep === 5 && (
+            {!isImli && currentStep === 5 && (
               <ReviewSubmit
                 formData={formData}
                 onBack={goBack}
                 onSubmit={handleSubmit}
+                isSubmitting={isSubmitting}
+              />
+            )}
+
+            {/* ---- CLEANED IMLI FLOW (steps 2-3) ---- */}
+            {isImli && currentStep === 2 && (
+              <CleanedImliForm
+                imliData={imliData}
+                setImliData={setImliData}
+                onNext={goNext}
+                onBack={goBack}
+              />
+            )}
+            {isImli && currentStep === 3 && (
+              <CleanedImliPreview
+                imliData={imliData}
+                onBack={goBack}
+                onSubmit={handleImliSubmit}
                 isSubmitting={isSubmitting}
               />
             )}

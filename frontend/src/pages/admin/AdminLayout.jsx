@@ -12,6 +12,7 @@ import LocalsProfile from "./LocalsProfile"
 import Payment from "./Payment"
 import Billing from "./Billing"
 import Settings from "./Settings"
+import MobileNav from "../../components/common/MobileNav"
 
 const AdminLayout = () => {
   const [activePage, setActivePage] = useState("dashboard")
@@ -54,10 +55,13 @@ const AdminLayout = () => {
         <Header
           title={currentPage.title}
         />
-        <div className="flex-1 overflow-auto">
+        <div className="flex-1 overflow-auto pb-16 md:pb-0">
           <CurrentComponent {...currentPage.props} />
         </div>
       </div>
+
+      {/* Mobile bottom navigation */}
+      <MobileNav activePage={activePage} onPageChange={handlePageChange} />
     </div>
   )
 }

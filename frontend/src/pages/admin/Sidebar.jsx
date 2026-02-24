@@ -27,7 +27,7 @@ export default function Sidebar({ activePage, onPageChange }) {
   ]
 
   return (
-    <aside className="w-64 bg-white h-screen flex flex-col flex-shrink-0 border-r border-gray-200 transition-all duration-300 ease-in-out relative z-30">
+    <aside className="hidden md:flex w-64 bg-white h-screen flex-col flex-shrink-0 border-r border-gray-200 transition-all duration-300 ease-in-out relative z-30">
       {/* Header */}
       <div className="bg-[#ff741f] h-[64px] flex items-center justify-start px-4 gap-3 relative transition-all duration-300">
         <div className="flex items-center justify-center rounded-lg">
