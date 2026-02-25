@@ -29,15 +29,15 @@ export default function Sidebar({ activePage, onPageChange }) {
   return (
     <aside className="hidden md:flex w-64 bg-white h-screen flex-col flex-shrink-0 border-r border-gray-200 transition-all duration-300 ease-in-out relative z-30">
       {/* Header */}
-      <div className="bg-[#ff741f] h-[64px] flex items-center justify-start px-4 gap-3 relative transition-all duration-300">
+      <div className="h-[64px] flex items-center justify-start px-4 gap-3 relative transition-all duration-300">
         <div className="flex items-center justify-center rounded-lg">
           <img
             src="/stms-logo.svg"
             alt="SITMS Portal"
-            className="h-12 w-auto filter brightness-0 invert"
+            className="h-12 w-auto"
           />
         </div>
-        <span className="text-white font-bold text-sm leading-tight tracking-tight uppercase">
+        <span className="text-gray-900 font-bold text-sm leading-tight tracking-tight uppercase">
           Super Imli Traders
         </span>
       </div>

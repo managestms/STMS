@@ -214,15 +214,15 @@ export const confirmPayment = asyncHandler(async (req, res) => {
 
 
 export const logsdetails = asyncHandler(async (req, res) => {
-    const { localID } = req.body;
+    const { localID } = req.query;
 
     if (!localID) {
         throw new ApiError(400, "localID is required");
     }
 
-    const logDetails = await logs.find({ localID }).sort({ createdAt: -1 });
+    const logDetails = await logs.find({ LocalID: Number(localID) }).sort({ createdAt: -1 });
 
-    if (logDetails.length === 0) {
+    if (!logDetails || logDetails.length === 0) {
         throw new ApiError(404, "No logs found for this localID");
     }
 

@@ -13,6 +13,7 @@ import SackEntry from './SackEntry';
 import { t } from '../../i18n/translations';
 import { useLang } from '../../context/LanguageContext';
 import T from '../../i18n/T';
+import ExcelExport from './ExcelExport';
 
 const Dashboard = ({ navigateToAssignImli, onPageChange }) => {
   const { lang } = useLang();
@@ -57,7 +58,6 @@ const Dashboard = ({ navigateToAssignImli, onPageChange }) => {
     {
       id: 1,
       title: "Raw Imli",
-      titleUrdu: "خام املی",
       value: "78045 KG", // Static as per backend limitation
       borderColor: "border-orange-500",
       iconColor: "text-orange-600",
@@ -67,7 +67,6 @@ const Dashboard = ({ navigateToAssignImli, onPageChange }) => {
     {
       id: 2,
       title: "Cleaned Imli",
-      titleUrdu: "صاف املی",
       value: `${dashboardStats.cleaned} KG`,
       borderColor: "border-green-500",
       iconColor: "text-green-600",
@@ -77,7 +76,6 @@ const Dashboard = ({ navigateToAssignImli, onPageChange }) => {
     {
       id: 3,
       title: "Distributed Imli to Locals",
-      titleUrdu: "تقسیم شدہ املی",
       value: `${dashboardStats.distributed} KG`,
       borderColor: "border-blue-500",
       iconColor: "text-blue-600",
@@ -87,7 +85,6 @@ const Dashboard = ({ navigateToAssignImli, onPageChange }) => {
     {
       id: 4,
       title: "Pending Imli to be returned",
-      titleUrdu: "واپس آنے والی املی",
       value: `${dashboardStats.pending} KG`,
       borderColor: "border-purple-500",
       iconColor: "text-purple-600",
@@ -110,8 +107,8 @@ const Dashboard = ({ navigateToAssignImli, onPageChange }) => {
             >
               <div className="flex items-start justify-between mb-1.5 md:mb-4">
                 <div className="flex-1">
-                  <p className="text-gray-500 font-medium text-[11px] md:text-sm mb-0.5 md:mb-1 leading-tight">
-                    {stat.title}
+                  <p className={`text-gray-500 font-medium text-[11px] md:text-sm mb-0.5 md:mb-1 leading-tight ${lang === 'ur' ? 'urdu-ui text-right' : ''}`}>
+                    <T k={stat.title} />
                   </p>
                 </div>
                 <div className={`${stat.iconBg} p-1.5 md:p-2.5 rounded-md md:rounded-lg`}>
@@ -124,11 +121,6 @@ const Dashboard = ({ navigateToAssignImli, onPageChange }) => {
                   <h3 className="text-base md:text-2xl font-bold text-gray-900">
                     {stat.value}
                   </h3>
-                </div>
-                <div className="text-right">
-                  <p className="urdu-ui text-sm md:text-xl font-bold text-gray-900 -mb-1">
-                    {stat.titleUrdu}
-                  </p>
                 </div>
               </div>
             </div>
@@ -179,6 +171,7 @@ const Dashboard = ({ navigateToAssignImli, onPageChange }) => {
                 <span className="text-[10px] md:text-xs font-semibold"><T k="Imli Cleaned" /></span>
               </button>
             </div>
+            <ExcelExport />
           </div>
         </div>
       </div>

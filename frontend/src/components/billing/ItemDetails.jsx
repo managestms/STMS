@@ -78,6 +78,7 @@ export default function ItemDetails({ formData, updateFormData, onNext, onBack }
                             type="number"
                             value={item.quantity || ""}
                             onChange={(e) => handleChange("quantity", e.target.value)}
+                            onWheel={(e) => e.target.blur()}
                             placeholder="e.g. 15300"
                             min="0"
                             step="0.01"
@@ -121,6 +122,7 @@ export default function ItemDetails({ formData, updateFormData, onNext, onBack }
                             type="number"
                             value={item.rate || ""}
                             onChange={(e) => handleChange("rate", e.target.value)}
+                            onWheel={(e) => e.target.blur()}
                             placeholder="e.g. 32.00"
                             min="0"
                             step="0.01"
@@ -137,6 +139,7 @@ export default function ItemDetails({ formData, updateFormData, onNext, onBack }
                             type="number"
                             value={item.gstPercent ?? ""}
                             onChange={(e) => handleChange("gstPercent", e.target.value)}
+                            onWheel={(e) => e.target.blur()}
                             placeholder="e.g. 5"
                             min="0"
                             max="28"

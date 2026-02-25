@@ -148,6 +148,7 @@ const SackEntryColumn = ({
                                 type="number"
                                 value={row.quantity}
                                 onChange={(e) => handleChange(index, 'quantity', e.target.value)}
+                                onWheel={(e) => e.target.blur()}
                                 className="w-full bg-transparent border-b border-transparent focus:border-orange-500 outline-none text-xs md:text-sm font-medium text-gray-700 placeholder-gray-400 py-0.5 md:py-1 text-right transition-all"
                                 placeholder="0"
                             />

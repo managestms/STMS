@@ -8,11 +8,11 @@ const Header = ({ title }) => {
       <div className="flex items-center gap-3">
         {/* Mobile: show logo + title since sidebar is hidden */}
         <div className="flex md:hidden items-center gap-2.5">
-          <div className="bg-[#ff741f] w-8 h-8 rounded-lg flex items-center justify-center shrink-0">
+          <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0">
             <img
               src="/stms-logo.svg"
               alt="STMS"
-              className="h-5 w-auto filter brightness-0 invert"
+              className="h-5 w-auto"
             />
           </div>
           <h2 className="text-sm font-bold tracking-wide truncate text-orange-600 uppercase">{title}</h2>

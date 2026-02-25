@@ -117,6 +117,7 @@ export default function CleanedImliForm({ imliData, setImliData, onNext, onBack 
                                     type="number"
                                     value={row.quantity}
                                     onChange={(e) => updateRow(index, "quantity", e.target.value)}
+                                    onWheel={(e) => e.target.blur()}
                                     placeholder="0"
                                     min="0"
                                     className="w-full px-3 py-2.5 bg-white border border-gray-300 rounded-lg text-sm font-medium placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
@@ -135,6 +136,7 @@ export default function CleanedImliForm({ imliData, setImliData, onNext, onBack 
                                 type="number"
                                 value={row.weight}
                                 onChange={(e) => updateRow(index, "weight", e.target.value)}
+                                onWheel={(e) => e.target.blur()}
                                 placeholder="0"
                                 min="0"
                                 step="0.01"
@@ -148,6 +150,7 @@ export default function CleanedImliForm({ imliData, setImliData, onNext, onBack 
                                 type="number"
                                 value={row.amount}
                                 onChange={(e) => updateRow(index, "amount", e.target.value)}
+                                onWheel={(e) => e.target.blur()}
                                 placeholder="0"
                                 min="0"
                                 step="0.01"
@@ -229,6 +232,7 @@ export default function CleanedImliForm({ imliData, setImliData, onNext, onBack 
                                 type="number"
                                 value={row.quantity}
                                 onChange={(e) => updateRow(index, "quantity", e.target.value)}
+                                onWheel={(e) => e.target.blur()}
                                 placeholder="0"
                                 min="0"
                                 className="w-full px-3 py-2.5 bg-gray-50 border-none rounded-lg text-sm font-medium placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500/20"
@@ -244,6 +248,7 @@ export default function CleanedImliForm({ imliData, setImliData, onNext, onBack 
                                     type="number"
                                     value={row.weight}
                                     onChange={(e) => updateRow(index, "weight", e.target.value)}
+                                    onWheel={(e) => e.target.blur()}
                                     placeholder="0"
                                     min="0"
                                     step="0.01"
@@ -257,6 +262,7 @@ export default function CleanedImliForm({ imliData, setImliData, onNext, onBack 
                                     type="number"
                                     value={row.amount}
                                     onChange={(e) => updateRow(index, "amount", e.target.value)}
+                                    onWheel={(e) => e.target.blur()}
                                     placeholder="0"
                                     min="0"
                                     step="0.01"

@@ -272,6 +272,7 @@ const AssignImli = ({ prefilledLocalId, prefilledLocal }) => {
                       placeholder="0.00"
                       value={formData.assignedQuantity}
                       onChange={handleQuantityChange}
+                      onWheel={(e) => e.target.blur()}
                       className="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all duration-200 text-base font-medium"
                       style={{ fontSize: '16px' }}
                       required

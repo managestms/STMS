@@ -1,8 +1,11 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { MdPayment, MdRefresh, MdSearch, MdError, MdKeyboardArrowDown, MdKeyboardArrowUp, MdCheckCircle, MdMoney, MdPayment as MdOnlinePayment } from 'react-icons/md'
+import { MdPayment, MdRefresh, MdSearch, MdError, MdKeyboardArrowDown, MdKeyboardArrowUp, MdCheckCircle, MdMoney, MdPayment as MdOnlinePayment, MdHistory } from 'react-icons/md'
+
 import api from "../../api/axios"
+import PaymentLogs from "./PaymentLogs"
+
 
 const Payment = () => {
     const [locals, setLocals] = useState([])
@@ -17,6 +20,8 @@ const Payment = () => {
     const [paymentLoading, setPaymentLoading] = useState(false)
     const [paymentResult, setPaymentResult] = useState(null)
     const [paymentError, setPaymentError] = useState(null)
+    const [activeTab, setActiveTab] = useState("payment")
+
 
     useEffect(() => {
         fetchLocals()
@@ -85,9 +90,11 @@ const Payment = () => {
             setPaymentMethod("Cash")
             setPaymentResult(null)
             setPaymentError(null)
+            setActiveTab("payment")
             fetchOrderReference(local.LocalID)
         }
     }
+
 
     const handleConfirmPayment = async (localId) => {
         if (!orderData) return
@@ -279,277 +286,215 @@ const Payment = () => {
                                     </button>
                                 </div>
 
-                                {/* Expanded Content */}
-                                <div className={`transition-all duration-500 ease-in-out overflow-hidden ${isExpanded ? 'max-h-[800px] opacity-100' : 'max-h-0 opacity-0'}`}>
-                                    <div className="p-4 md:p-8 bg-white border-t border-gray-100">
-                                        {orderLoading ? (
-                                            <div className="flex items-center justify-center py-12">
-                                                <div className="w-8 h-8 border-4 border-orange-500 border-t-transparent rounded-full animate-spin"></div>
-                                                <span className="ml-3 text-gray-600 font-medium">Loading order details...</span>
+                                {/* Tab Navigation */}
+                                {isExpanded && (
+                                    <div className="px-4 md:px-8 pt-4 bg-white border-t border-gray-100 flex gap-4 md:gap-8">
+                                        <button
+                                            onClick={() => setActiveTab("payment")}
+                                            className={`pb-3 text-sm font-bold transition-all border-b-2 ${activeTab === 'payment' ? 'text-orange-600 border-orange-600' : 'text-gray-400 border-transparent hover:text-gray-600'}`}
+                                        >
+                                            <div className="flex items-center gap-2">
+                                                <MdPayment />
+                                                <span>Payment</span>
                                             </div>
-                                        ) : paymentError && !orderData && !paymentResult ? (
-                                            <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg text-center">
-                                                <p className="text-yellow-800 font-medium">{paymentError}</p>
+                                        </button>
+                                        <button
+                                            onClick={() => setActiveTab("history")}
+                                            className={`pb-3 text-sm font-bold transition-all border-b-2 ${activeTab === 'history' ? 'text-orange-600 border-orange-600' : 'text-gray-400 border-transparent hover:text-gray-600'}`}
+                                        >
+                                            <div className="flex items-center gap-2">
+                                                <MdHistory />
+                                                <span>History</span>
                                             </div>
-                                        ) : (
-                                            <div className="flex flex-col lg:flex-row justify-between gap-5 md:gap-10">
-                                                <div className="lg:w-2/3">
-                                                    <div className="mb-4 md:mb-8 p-3 md:p-4 bg-orange-50/50 rounded-lg border-l-4 border-orange-500 text-gray-700 font-medium text-xs md:text-sm">
-                                                        {(() => {
-                                                            const date = local.updatedAt ? new Date(local.updatedAt) : new Date();
-                                                            const day = date.getDay();
-                                                            const diff = date.getDate() - day + (day >= 4 ? 4 : -3);
-                                                            const start = new Date(date);
-                                                            start.setDate(diff);
-                                                            const end = new Date(start);
-                                                            end.setDate(start.getDate() + 7);
-                                                            const format = (d) => `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth() + 1).toString().padStart(2, '0')}`;
-                                                            return `Period: Thursday ${format(start)} to ${format(end)}`;
-                                                        })()}
-                                                    </div>
+                                        </button>
+                                    </div>
+                                )}
 
-                                                    {/* Mobile: Cards | Desktop: Table */}
-                                                    <div className="hidden md:block overflow-hidden rounded-lg border border-gray-200">
-                                                        <table className="w-full text-left">
-                                                            <thead className="bg-gray-50 text-gray-600 uppercase text-xs font-semibold tracking-wider">
-                                                                <tr>
-                                                                    <th className="px-6 py-4">Date</th>
-                                                                    <th className="px-6 py-4">Assigned Quantity</th>
-                                                                    <th className="px-6 py-4">Cleaned Qty.</th>
-                                                                </tr>
-                                                            </thead>
-                                                            <tbody className="divide-y divide-gray-100 text-gray-700 text-sm">
-                                                                <tr className="hover:bg-gray-50/50 transition-colors">
-                                                                    <td className="px-6 py-4 font-medium">
+                                {/* Expanded Content Area */}
+                                <div className={`transition-all duration-300 ease-in-out overflow-hidden ${isExpanded ? 'opacity-100 min-h-[400px]' : 'max-h-0 opacity-0'}`}>
+                                    <div className="p-4 md:p-8 bg-white border-t border-gray-50">
+                                        <div className="relative">
+                                            {/* Payment Tab Content */}
+                                            <div className={`transition-all duration-300 ease-in-out ${activeTab === 'payment' ? 'opacity-100 visible translate-y-0 relative' : 'opacity-0 invisible -translate-y-2 absolute inset-0 pointer-events-none'}`}>
+                                                {orderLoading ? (
+                                                    <div className="flex items-center justify-center py-12">
+                                                        <div className="w-8 h-8 border-4 border-orange-500 border-t-transparent rounded-full animate-spin"></div>
+                                                        <span className="ml-3 text-gray-600 font-medium">Loading order details...</span>
+                                                    </div>
+                                                ) : paymentError && !orderData && !paymentResult ? (
+                                                    <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg text-center">
+                                                        <p className="text-yellow-800 font-medium">{paymentError}</p>
+                                                    </div>
+                                                ) : (
+                                                    <div className="flex flex-col lg:flex-row justify-between gap-5 md:gap-10">
+                                                        <div className="lg:w-2/3">
+                                                            <div className="mb-4 md:mb-8 p-3 md:p-4 bg-orange-50/50 rounded-lg border-l-4 border-orange-500 text-gray-700 font-medium text-xs md:text-sm">
+                                                                {(() => {
+                                                                    const date = local.updatedAt ? new Date(local.updatedAt) : new Date();
+                                                                    const day = date.getDay();
+                                                                    const diff = date.getDate() - day + (day >= 4 ? 4 : -3);
+                                                                    const start = new Date(date);
+                                                                    start.setDate(diff);
+                                                                    const end = new Date(start);
+                                                                    end.setDate(start.getDate() + 7);
+                                                                    const format = (d) => `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth() + 1).toString().padStart(2, '0')}`;
+                                                                    return `Period: Thursday ${format(start)} to ${format(end)}`;
+                                                                })()}
+                                                            </div>
+
+                                                            {/* Desktop Table */}
+                                                            <div className="hidden md:block overflow-hidden rounded-lg border border-gray-200">
+                                                                <table className="w-full text-left">
+                                                                    <thead className="bg-gray-50 text-gray-600 uppercase text-xs font-semibold tracking-wider">
+                                                                        <tr>
+                                                                            <th className="px-6 py-4">Date</th>
+                                                                            <th className="px-6 py-4">Assigned Quantity</th>
+                                                                            <th className="px-6 py-4">Cleaned Qty.</th>
+                                                                        </tr>
+                                                                    </thead>
+                                                                    <tbody className="divide-y divide-gray-100 text-gray-700 text-sm">
+                                                                        <tr className="hover:bg-gray-50/50 transition-colors">
+                                                                            <td className="px-6 py-4 font-medium">
+                                                                                {local.updatedAt ? new Date(local.updatedAt).toLocaleDateString("en-GB", {
+                                                                                    day: "numeric",
+                                                                                    month: "short",
+                                                                                    year: "numeric"
+                                                                                }) : "-"}
+                                                                            </td>
+                                                                            <td className="px-6 py-4">{assignedQty}</td>
+                                                                            <td className="px-6 py-4">{cleanedQty}</td>
+                                                                        </tr>
+                                                                        <tr className="bg-gray-50/50 text-gray-900 font-semibold">
+                                                                            <td className="px-6 py-4">Total :</td>
+                                                                            <td className="px-6 py-4">{assignedQty}</td>
+                                                                            <td className="px-6 py-4">{cleanedQty}</td>
+                                                                        </tr>
+                                                                    </tbody>
+                                                                </table>
+                                                            </div>
+
+                                                            {/* Mobile cards */}
+                                                            <div className="md:hidden space-y-3">
+                                                                <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
+                                                                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-1">Date</p>
+                                                                    <p className="text-sm font-bold text-gray-900">
                                                                         {local.updatedAt ? new Date(local.updatedAt).toLocaleDateString("en-GB", {
                                                                             day: "numeric",
                                                                             month: "short",
                                                                             year: "numeric"
                                                                         }) : "-"}
-                                                                    </td>
-                                                                    <td className="px-6 py-4">{assignedQty}</td>
-                                                                    <td className="px-6 py-4">{cleanedQty}</td>
-                                                                </tr>
-                                                                <tr className="bg-gray-50/50 text-gray-900 font-semibold">
-                                                                    <td className="px-6 py-4">Total :</td>
-                                                                    <td className="px-6 py-4">{assignedQty}</td>
-                                                                    <td className="px-6 py-4">{cleanedQty}</td>
-                                                                </tr>
-                                                            </tbody>
-                                                        </table>
-                                                    </div>
-
-                                                    {/* Mobile order details cards */}
-                                                    <div className="md:hidden space-y-3">
-                                                        <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
-                                                            <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-1">Date</p>
-                                                            <p className="text-sm font-bold text-gray-900">
-                                                                {local.updatedAt ? new Date(local.updatedAt).toLocaleDateString("en-GB", {
-                                                                    day: "numeric",
-                                                                    month: "short",
-                                                                    year: "numeric"
-                                                                }) : "-"}
-                                                            </p>
-                                                        </div>
-                                                        <div className="grid grid-cols-2 gap-3">
-                                                            <div className="bg-blue-50 rounded-xl p-4 border border-blue-100">
-                                                                <p className="text-[10px] text-blue-500 font-bold uppercase tracking-wider mb-1">Assigned</p>
-                                                                <p className="text-xl font-bold text-blue-700">{assignedQty}</p>
-                                                            </div>
-                                                            <div className="bg-green-50 rounded-xl p-4 border border-green-100">
-                                                                <p className="text-[10px] text-green-500 font-bold uppercase tracking-wider mb-1">Cleaned</p>
-                                                                <p className="text-xl font-bold text-green-700">{cleanedQty}</p>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-                                                <div className="lg:w-1/3 flex flex-col justify-between p-4 md:p-6 bg-white rounded-xl border border-gray-200 shadow-sm">
-                                                    {/* Payment Result */}
-                                                    {paymentResult ? (
-                                                        <div className="text-center space-y-4">
-                                                            {/* PENDING — Online Step 1: Show QR + Confirm/Reject buttons */}
-                                                            {paymentResult.status === "PENDING" ? (
-                                                                <>
-                                                                    <div className="bg-yellow-50 w-16 h-16 rounded-full flex items-center justify-center mx-auto">
-                                                                        <MdOnlinePayment className="text-4xl text-yellow-500" />
+                                                                    </p>
+                                                                </div>
+                                                                <div className="grid grid-cols-2 gap-3">
+                                                                    <div className="bg-blue-50 rounded-xl p-4 border border-blue-100">
+                                                                        <p className="text-[10px] text-blue-500 font-bold uppercase tracking-wider mb-1">Assigned</p>
+                                                                        <p className="text-xl font-bold text-blue-700">{assignedQty}</p>
                                                                     </div>
-                                                                    <h3 className="text-base md:text-lg font-bold text-gray-900">Scan QR to Pay</h3>
-                                                                    <p className="text-xl md:text-2xl font-bold text-orange-600">₹{paymentResult.total}</p>
-
-                                                                    {paymentResult.qr && (
-                                                                        <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
-                                                                            <img src={paymentResult.qr} alt="UPI QR Code" className="w-44 h-44 mx-auto rounded-lg" />
-                                                                            <p className="text-xs text-gray-600 mt-2 font-mono">{paymentResult.upiId}</p>
-                                                                        </div>
-                                                                    )}
-
-                                                                    {/* Payment Error */}
-                                                                    {paymentError && (
-                                                                        <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
-                                                                            <p className="text-red-700 text-sm font-medium">{paymentError}</p>
-                                                                        </div>
-                                                                    )}
-
-                                                                    {/* Confirm / Reject buttons */}
-                                                                    <div className="grid grid-cols-2 gap-3 pt-2">
-                                                                        <button
-                                                                            onClick={() => handleOnlineStatus(local.LocalID, "REJECTED")}
-                                                                            disabled={paymentLoading}
-                                                                            className="py-3 bg-red-500 text-white rounded-lg font-semibold hover:bg-red-600 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
-                                                                        >
-                                                                            ✕ Reject
-                                                                        </button>
-                                                                        <button
-                                                                            onClick={() => handleOnlineStatus(local.LocalID, "SUCCESS")}
-                                                                            disabled={paymentLoading}
-                                                                            className="py-3 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center gap-1"
-                                                                        >
-                                                                            {paymentLoading ? (
-                                                                                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                                                                            ) : (
-                                                                                <>
-                                                                                    <MdCheckCircle className="text-lg" />
-                                                                                    Confirm
-                                                                                </>
-                                                                            )}
-                                                                        </button>
+                                                                    <div className="bg-green-50 rounded-xl p-4 border border-green-100">
+                                                                        <p className="text-[10px] text-green-500 font-bold uppercase tracking-wider mb-1">Cleaned</p>
+                                                                        <p className="text-xl font-bold text-green-700">{cleanedQty}</p>
                                                                     </div>
-                                                                </>
-
-                                                            ) : paymentResult.status === "SUCCESS" ? (
-                                                                /* SUCCESS — Cash direct or Online confirmed */
-                                                                <>
-                                                                    <div className="bg-green-50 w-16 h-16 rounded-full flex items-center justify-center mx-auto">
-                                                                        <MdCheckCircle className="text-4xl text-green-500" />
-                                                                    </div>
-                                                                    <h3 className="text-lg md:text-xl font-bold text-gray-900">Payment Successful!</h3>
-                                                                    <div className="space-y-2 text-sm">
-                                                                        <div className="flex justify-between py-2 border-b border-gray-100">
-                                                                            <span className="text-gray-500">Amount</span>
-                                                                            <span className="font-bold text-green-600">₹{paymentResult.total}</span>
-                                                                        </div>
-                                                                        <div className="flex justify-between py-2 border-b border-gray-100">
-                                                                            <span className="text-gray-500">Method</span>
-                                                                            <span className="font-semibold">{paymentResult.method}</span>
-                                                                        </div>
-                                                                        <div className="flex justify-between py-2">
-                                                                            <span className="text-gray-500">Total Paid</span>
-                                                                            <span className="font-bold text-orange-600">₹{paymentResult.localTotalPaid}</span>
-                                                                        </div>
-                                                                    </div>
-                                                                </>
-
-                                                            ) : (
-                                                                /* REJECTED */
-                                                                <>
-                                                                    <div className="bg-red-50 w-16 h-16 rounded-full flex items-center justify-center mx-auto">
-                                                                        <MdError className="text-4xl text-red-500" />
-                                                                    </div>
-                                                                    <h3 className="text-lg md:text-xl font-bold text-gray-900">Payment Rejected</h3>
-                                                                    <div className="space-y-2 text-sm">
-                                                                        <div className="flex justify-between py-2 border-b border-gray-100">
-                                                                            <span className="text-gray-500">Amount</span>
-                                                                            <span className="font-bold text-red-600">₹{orderData?.total || "—"}</span>
-                                                                        </div>
-                                                                        <div className="flex justify-between py-2 border-b border-gray-100">
-                                                                            <span className="text-gray-500">Method</span>
-                                                                            <span className="font-semibold">{paymentResult.method}</span>
-                                                                        </div>
-                                                                        <div className="flex justify-between py-2 border-b border-gray-100">
-                                                                            <span className="text-gray-500">Status</span>
-                                                                            <span className="font-bold text-red-600">REJECTED</span>
-                                                                        </div>
-                                                                        <div className="flex justify-between py-2">
-                                                                            <span className="text-gray-500">Deduction</span>
-                                                                            <span className="font-semibold text-gray-700">No amount deducted</span>
-                                                                        </div>
-                                                                    </div>
-                                                                    <button
-                                                                        onClick={() => { setPaymentResult(null); setPaymentError(null); fetchOrderReference(local.LocalID); }}
-                                                                        className="w-full mt-2 py-3 bg-orange-500 text-white rounded-lg font-semibold hover:bg-orange-600 transition-colors shadow-sm"
-                                                                    >
-                                                                        Retry Payment
-                                                                    </button>
-                                                                </>
-                                                            )}
-                                                        </div>
-                                                    ) : orderData ? (
-                                                        <>
-                                                            {/* Order Reference */}
-                                                            <div className="flex justify-between items-center mb-8">
-                                                                <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Order Reference</span>
-                                                                <span className="px-2 py-1 bg-gray-100 rounded text-xs font-mono font-medium text-gray-600">
-                                                                    {orderData.orderReference?.slice(-6) || "—"}
-                                                                </span>
-                                                            </div>
-
-                                                            {/* Amount */}
-                                                            <div className="text-center mb-5 md:mb-8 pb-5 md:pb-8 border-b border-gray-100">
-                                                                <div className="text-gray-500 text-xs font-medium mb-2 uppercase tracking-wide">Amount to Pay</div>
-                                                                <div className="text-2xl md:text-3xl font-bold text-gray-900 flex items-center justify-center gap-1.5 md:gap-2 flex-wrap">
-                                                                    <span>{orderData.quantity}</span>
-                                                                    <span className="text-gray-400 text-lg md:text-xl">×</span>
-                                                                    <span>{orderData.price_per_cleaned_imli}</span>
-                                                                    <span className="text-gray-400 text-lg md:text-xl">=</span>
-                                                                    <span className="text-orange-600">₹{orderData.total}</span>
                                                                 </div>
                                                             </div>
+                                                        </div>
 
-                                                            {/* Payment Method + Confirm */}
-                                                            <div className="space-y-4">
-                                                                <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 md:mb-3">Payment Method</div>
-                                                                <div className="grid grid-cols-2 gap-2 md:gap-3 mb-4 md:mb-6">
-                                                                    <button
-                                                                        onClick={() => setPaymentMethod("Cash")}
-                                                                        className={`flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 border ${paymentMethod === "Cash" ? 'bg-orange-50 border-orange-200 text-orange-700 ring-1 ring-orange-200' : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300 hover:bg-gray-50'}`}
-                                                                    >
-                                                                        <MdMoney className={`text-lg ${paymentMethod === "Cash" ? 'text-orange-600' : 'text-gray-400'}`} />
-                                                                        Cash
-                                                                    </button>
-                                                                    <button
-                                                                        onClick={() => setPaymentMethod("Online")}
-                                                                        className={`flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 border ${paymentMethod === "Online" ? 'bg-orange-50 border-orange-200 text-orange-700 ring-1 ring-orange-200' : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300 hover:bg-gray-50'}`}
-                                                                    >
-                                                                        <MdOnlinePayment className={`text-lg ${paymentMethod === "Online" ? 'text-orange-600' : 'text-gray-400'}`} />
-                                                                        Online
-                                                                    </button>
-                                                                </div>
-
-                                                                {/* Payment Error */}
-                                                                {paymentError && (
-                                                                    <div className="p-3 bg-red-50 border border-red-200 rounded-lg mb-3">
-                                                                        <p className="text-red-700 text-sm font-medium">{paymentError}</p>
-                                                                    </div>
-                                                                )}
-
-                                                                <button
-                                                                    onClick={() => handleConfirmPayment(local.LocalID)}
-                                                                    disabled={paymentLoading || !orderData.total}
-                                                                    className="w-full py-3.5 bg-green-600 text-white rounded-lg font-semibold text-base hover:bg-green-700 transition-colors shadow-sm flex items-center justify-center gap-2 active:bg-green-800 disabled:bg-gray-300 disabled:cursor-not-allowed"
-                                                                >
-                                                                    {paymentLoading ? (
+                                                        <div className="lg:w-1/3 flex flex-col justify-between p-4 md:p-6 bg-white rounded-xl border border-gray-200 shadow-sm">
+                                                            {paymentResult ? (
+                                                                <div className="text-center space-y-4">
+                                                                    {paymentResult.status === "PENDING" ? (
                                                                         <>
-                                                                            <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                                                                            Processing...
+                                                                            <div className="bg-yellow-50 w-16 h-16 rounded-full flex items-center justify-center mx-auto">
+                                                                                <MdOnlinePayment className="text-4xl text-yellow-500" />
+                                                                            </div>
+                                                                            <h3 className="text-base md:text-lg font-bold text-gray-900">Scan QR to Pay</h3>
+                                                                            <p className="text-xl md:text-2xl font-bold text-orange-600">₹{paymentResult.total}</p>
+                                                                            {paymentResult.qr && (
+                                                                                <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                                                                                    <img src={paymentResult.qr} alt="UPI QR Code" className="w-44 h-44 mx-auto rounded-lg" />
+                                                                                    <p className="text-xs text-gray-600 mt-2 font-mono">{paymentResult.upiId}</p>
+                                                                                </div>
+                                                                            )}
+                                                                            {paymentError && (
+                                                                                <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
+                                                                                    <p className="text-red-700 text-sm font-medium">{paymentError}</p>
+                                                                                </div>
+                                                                            )}
+                                                                            <div className="grid grid-cols-2 gap-3 pt-2">
+                                                                                <button onClick={() => handleOnlineStatus(local.LocalID, "REJECTED")} disabled={paymentLoading} className="py-3 bg-red-500 text-white rounded-lg font-semibold hover:bg-red-600 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed">✕ Reject</button>
+                                                                                <button onClick={() => handleOnlineStatus(local.LocalID, "SUCCESS")} disabled={paymentLoading} className="py-3 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center gap-1">
+                                                                                    {paymentLoading ? <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div> : <><MdCheckCircle className="text-lg" />Confirm</>}
+                                                                                </button>
+                                                                            </div>
+                                                                        </>
+                                                                    ) : paymentResult.status === "SUCCESS" ? (
+                                                                        <>
+                                                                            <div className="bg-green-50 w-16 h-16 rounded-full flex items-center justify-center mx-auto">
+                                                                                <MdCheckCircle className="text-4xl text-green-500" />
+                                                                            </div>
+                                                                            <h3 className="text-lg md:text-xl font-bold text-gray-900">Payment Successful!</h3>
+                                                                            <div className="space-y-2 text-sm">
+                                                                                <div className="flex justify-between py-2 border-b border-gray-100"><span className="text-gray-500">Amount</span><span className="font-bold text-green-600">₹{paymentResult.total}</span></div>
+                                                                                <div className="flex justify-between py-2 border-b border-gray-100"><span className="text-gray-500">Method</span><span className="font-semibold">{paymentResult.method}</span></div>
+                                                                                <div className="flex justify-between py-2"><span className="text-gray-500">Total Paid</span><span className="font-bold text-orange-600">₹{paymentResult.localTotalPaid}</span></div>
+                                                                            </div>
                                                                         </>
                                                                     ) : (
                                                                         <>
-                                                                            <MdCheckCircle className="text-xl" />
-                                                                            Confirm & Pay ₹{orderData.total}
+                                                                            <div className="bg-red-50 w-16 h-16 rounded-full flex items-center justify-center mx-auto">
+                                                                                <MdError className="text-4xl text-red-500" />
+                                                                            </div>
+                                                                            <h3 className="text-lg md:text-xl font-bold text-gray-900">Payment Rejected</h3>
+                                                                            <div className="space-y-2 text-sm">
+                                                                                <div className="flex justify-between py-2 border-b border-gray-100"><span className="text-gray-500">Amount</span><span className="font-bold text-red-600">₹{orderData?.total || "—"}</span></div>
+                                                                                <div className="flex justify-between py-2 border-b border-gray-100"><span className="text-gray-500">Method</span><span className="font-semibold">{paymentResult.method}</span></div>
+                                                                                <div className="flex justify-between py-2 border-b border-gray-100"><span className="text-gray-500">Status</span><span className="font-bold text-red-600">REJECTED</span></div>
+                                                                                <div className="flex justify-between py-2"><span className="text-gray-500">Deduction</span><span className="font-semibold text-gray-700">No amount deducted</span></div>
+                                                                            </div>
+                                                                            <button onClick={() => { setPaymentResult(null); setPaymentError(null); fetchOrderReference(local.LocalID); }} className="w-full mt-2 py-3 bg-orange-500 text-white rounded-lg font-semibold hover:bg-orange-600 transition-colors shadow-sm">Retry Payment</button>
                                                                         </>
                                                                     )}
-                                                                </button>
-                                                            </div>
-                                                        </>
-                                                    ) : (
-                                                        <div className="text-center py-8 text-gray-400">
-                                                            <p className="font-medium">No pending payment</p>
+                                                                </div>
+                                                            ) : orderData ? (
+                                                                <>
+                                                                    <div className="flex justify-between items-center mb-8">
+                                                                        <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Order Reference</span>
+                                                                        <span className="px-2 py-1 bg-gray-100 rounded text-xs font-mono font-medium text-gray-600">{orderData.orderReference?.slice(-6) || "—"}</span>
+                                                                    </div>
+                                                                    <div className="text-center mb-5 md:mb-8 pb-5 md:pb-8 border-b border-gray-100">
+                                                                        <div className="text-gray-500 text-xs font-medium mb-2 uppercase tracking-wide">Amount to Pay</div>
+                                                                        <div className="text-2xl md:text-3xl font-bold text-gray-900 flex items-center justify-center gap-1.5 md:gap-2 flex-wrap">
+                                                                            <span>{orderData.quantity}</span>
+                                                                            <span className="text-gray-400 text-lg md:text-xl">×</span>
+                                                                            <span>{orderData.price_per_cleaned_imli}</span>
+                                                                            <span className="text-gray-400 text-lg md:text-xl">=</span>
+                                                                            <span className="text-orange-600">₹{orderData.total}</span>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div className="space-y-4">
+                                                                        <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 md:mb-3">Payment Method</div>
+                                                                        <div className="grid grid-cols-2 gap-2 md:gap-3 mb-4 md:mb-6">
+                                                                            <button onClick={() => setPaymentMethod("Cash")} className={`flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 border ${paymentMethod === "Cash" ? 'bg-orange-50 border-orange-200 text-orange-700 ring-1 ring-orange-200' : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300 hover:bg-gray-50'}`}><MdMoney className={`text-lg ${paymentMethod === "Cash" ? 'text-orange-600' : 'text-gray-400'}`} />Cash</button>
+                                                                            <button onClick={() => setPaymentMethod("Online")} className={`flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 border ${paymentMethod === "Online" ? 'bg-orange-50 border-orange-200 text-orange-700 ring-1 ring-orange-200' : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300 hover:bg-gray-50'}`}><MdOnlinePayment className={`text-lg ${paymentMethod === "Online" ? 'text-orange-600' : 'text-gray-400'}`} />Online</button>
+                                                                        </div>
+                                                                        {paymentError && <div className="p-3 bg-red-50 border border-red-200 rounded-lg mb-3"><p className="text-red-700 text-sm font-medium">{paymentError}</p></div>}
+                                                                        <button onClick={() => handleConfirmPayment(local.LocalID)} disabled={paymentLoading || !orderData.total} className="w-full py-3.5 bg-green-600 text-white rounded-lg font-semibold text-base hover:bg-green-700 transition-colors shadow-sm flex items-center justify-center gap-2 active:bg-green-800 disabled:bg-gray-300 disabled:cursor-not-allowed">
+                                                                            {paymentLoading ? <><div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>Processing...</> : <><MdCheckCircle className="text-xl" />Confirm & Pay ₹{orderData.total}</>}
+                                                                        </button>
+                                                                    </div>
+                                                                </>
+                                                            ) : (
+                                                                <div className="text-center py-8 text-gray-400"><p className="font-medium">No pending payment</p></div>
+                                                            )}
                                                         </div>
-                                                    )}
-                                                </div>
+                                                    </div>
+                                                )}
                                             </div>
-                                        )}
+
+                                            {/* History Tab Content */}
+                                            <div className={`transition-all duration-300 ease-in-out ${activeTab === 'history' ? 'opacity-100 visible translate-y-0 relative' : 'opacity-0 invisible translate-y-2 absolute inset-0 pointer-events-none'}`}>
+                                                {isExpanded && <PaymentLogs localID={local.LocalID} />}
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>

@@ -215,6 +215,7 @@ export default function Settings() {
                                                     type="number"
                                                     value={price}
                                                     onChange={(e) => setPrice(e.target.value)}
+                                                    onWheel={(e) => e.target.blur()}
                                                     placeholder="e.g. 15"
                                                     style={{ fontSize: '16px' }}
                                                     className={`w-full pl-10 pr-4 py-3 md:py-4 bg-white border rounded-xl md:rounded-2xl text-base md:text-lg font-semibold transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-orange-500/10 ${isPriceEditing
