@@ -14,7 +14,19 @@ export const paymentxlsl = asyncHandler(async (req, res) => {
         throw new ApiError(404, "No payment data found");
     }
 
-    const buffer = xlslhandler(paymentlog, "Payments");
+    // Build LocalID → LocalName lookup
+    const locals = await localData.find({}, { LocalID: 1, LocalName: 1 }).lean();
+    const nameMap = Object.fromEntries(
+        locals.map((l) => [l.LocalID, l.LocalName || "Unknown"])
+    );
+
+    // Inject localName into each payment row
+    const enriched = paymentlog.map((row) => ({
+        ...row,
+        localName: nameMap[row.LocalID] || "Unknown",
+    }));
+
+    const buffer = xlslhandler(enriched, "Payments");
 
     res.setHeader("Content-Type", XLSX_CONTENT_TYPE);
     res.setHeader("Content-Disposition", "attachment; filename=payments.xlsx");
