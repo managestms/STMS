@@ -158,14 +158,8 @@ const AssignImli = ({ prefilledLocalId, prefilledLocal }) => {
           {/* Header */}
           <div className="bg-white px-4 md:px-8 py-4 md:py-6 md:border-b md:border-gray-100">
             <div className="flex justify-between items-center">
-              <div className="flex items-center gap-3 md:gap-4">
-                <div className="bg-orange-50 p-2 md:p-3 rounded-lg md:border md:border-orange-100">
-                  <MdAssignment className="text-xl md:text-2xl text-orange-600" />
-                </div>
-                <div>
-                  <h1 className="text-xl md:text-2xl font-bold text-gray-900"><T k="Assign Imli" /></h1>
-                  <p className="text-gray-500 text-xs md:text-sm font-medium"><T k="Distribute raw imli to local workers" /></p>
-                </div>
+              <div className="bg-orange-50 p-2 md:p-3 rounded-lg md:border md:border-orange-100">
+                <MdAssignment className="text-xl md:text-2xl text-orange-600" />
               </div>
               <div className="hidden md:flex items-center gap-2 bg-gray-50 rounded-lg px-3 py-1.5 border border-gray-100">
                 <MdSchedule className="text-gray-400" />

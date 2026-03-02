@@ -37,7 +37,7 @@ export default function Sidebar({ activePage, onPageChange }) {
             className="h-12 w-auto"
           />
         </div>
-        <span className="text-gray-900 font-bold text-sm leading-tight tracking-tight uppercase">
+        <span className="text-gray-900 font-bold text-sm leading-tight tracking-tight">
           Super Imli Traders
         </span>
       </div>

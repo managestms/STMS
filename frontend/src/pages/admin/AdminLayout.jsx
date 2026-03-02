@@ -85,15 +85,15 @@ const AdminLayout = () => {
   }, [])
 
   const pageConfig = {
-    dashboard: { component: Dashboard, title: "DASHBOARD GENERAL", props: { navigateToAssignImli, onPageChange: handlePageChange } },
-    addLocals: { component: AddLocals, title: "ADD LOCALS", props: {} },
-    addRawImli: { component: AddRawImli, title: "ADD RAW IMLI IN STOCKS", props: {} },
-    assignImli: { component: AssignImli, title: "ASSIGN IMLI", props: navigationProps },
-    imliReturned: { component: ImliReturned, title: "IMLI RETURNED", props: {} },
-    localsProfile: { component: LocalsProfile, title: "LOCALS PROFILE", props: { navigateToAssignImli } },
-    payment: { component: Payment, title: "PAYMENT", props: {} },
-    billing: { component: Billing, title: "BILLING", props: {} },
-    settings: { component: Settings, title: "SETTINGS", props: {} },
+    dashboard: { component: Dashboard, title: "Dahsboard", props: { navigateToAssignImli, onPageChange: handlePageChange } },
+    addLocals: { component: AddLocals, title: "Add Locals", props: {} },
+    addRawImli: { component: AddRawImli, title: "Add Raw Imli", props: {} },
+    assignImli: { component: AssignImli, title: "Assign Imli", props: navigationProps },
+    imliReturned: { component: ImliReturned, title: "Imli Returned", props: {} },
+    localsProfile: { component: LocalsProfile, title: "Locals Profile", props: { navigateToAssignImli } },
+    payment: { component: Payment, title: "Payment", props: {} },
+    billing: { component: Billing, title: "Billing", props: {} },
+    settings: { component: Settings, title: "Settings", props: {} },
   }
 
   const currentPage = pageConfig[activePage]

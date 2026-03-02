@@ -18,7 +18,7 @@ const Header = ({ title }) => {
           <h2 className="text-sm font-bold tracking-wide truncate text-orange-600 uppercase">{title}</h2>
         </div>
         {/* Desktop: just the title (sidebar has logo) */}
-        <h2 className="hidden md:block text-sm font-bold tracking-wide truncate text-orange-600 uppercase">{title}</h2>
+        <h2 className="hidden md:block text-sm font-bold tracking-wide truncate text-orange-600">{title}</h2>
       </div>
 
       {/* Language Toggle */}

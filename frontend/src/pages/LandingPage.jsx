@@ -8,7 +8,6 @@ import FeaturesSection from '../components/landing/sections/FeaturesSection'
 import GallerySection from '../components/landing/sections/GallerySection'
 import StatsSection from '../components/landing/sections/StatsSection'
 import HowItWorksSection from '../components/landing/sections/HowItWorksSection'
-import OurProductSection from '../components/landing/sections/OurProductSection'
 import Footer from '../components/landing/sections/Footer'
 
 const LandingPage = () => {
@@ -114,7 +113,6 @@ const LandingPage = () => {
       <AboutSection />
       <FeaturesSection />
       <HowItWorksSection />
-      <OurProductSection />
       <StatsSection />
       <GallerySection />
       <Footer />
