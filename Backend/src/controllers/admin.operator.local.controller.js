@@ -34,4 +34,28 @@ const delete_local = asyncHandler(async (req, res) => {
     );
 });
 
-export { return_local, delete_local };
+const update_local = asyncHandler(async (req, res) => {
+    const { localId, LocalName, LocalPhone, LocalAddress, upiId } = req.body;
+
+    const local = await localData.findById(localId);
+    if (!local) {
+        throw new ApiError(404, "Local not found");
+    }
+
+    if (LocalName) local.LocalName = LocalName;
+    if (LocalPhone) local.LocalPhone = LocalPhone;
+    if (LocalAddress) local.LocalAddress = LocalAddress;
+    if (upiId !== undefined) local.upiId = upiId;
+
+    await local.save();
+
+    return res.status(200).json(
+        new ApiResponse(
+            200,
+            local,
+            "Local updated successfully"
+        )
+    );
+});
+
+export { return_local, delete_local, update_local };
