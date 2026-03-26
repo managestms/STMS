@@ -1,11 +1,32 @@
 import { IoClose, IoTrash } from "react-icons/io5"
-import { MdPerson, MdPhone, MdLocationOn, MdAssignment, MdEdit, MdInventory } from "react-icons/md"
-import { useState } from "react"
+import { MdPerson, MdPhone, MdLocationOn, MdAssignment, MdEdit, MdInventory, MdPayment, MdCheck, MdCancel } from "react-icons/md"
+import { useState, useEffect } from "react"
 import api from "../api/axios"
 
 const LocalDetailsModal = ({ isOpen, onClose, local, onDelete }) => {
   const [isDeleting, setIsDeleting] = useState(false)
   const [showConfirmDelete, setShowConfirmDelete] = useState(false)
+  
+  const [isEditing, setIsEditing] = useState(false)
+  const [isUpdating, setIsUpdating] = useState(false)
+  const [formData, setFormData] = useState({
+    LocalName: "",
+    LocalPhone: "",
+    LocalAddress: "",
+    upiId: ""
+  })
+
+  useEffect(() => {
+    if (local) {
+      setFormData({
+        LocalName: local.LocalName || "",
+        LocalPhone: local.LocalPhone || "",
+        LocalAddress: local.LocalAddress || "",
+        upiId: local.upiId || (local.payment && local.payment.localUPI) || ""
+      })
+      setIsEditing(false)
+    }
+  }, [local, isOpen])
 
   if (!isOpen || !local) return null
 
@@ -27,7 +48,36 @@ const LocalDetailsModal = ({ isOpen, onClose, local, onDelete }) => {
     }
   }
 
-  const pendingQuantity = (local.totalAssignedQuantity || 0) - (local.totalReturnedQuantity || 0)
+  const handleUpdate = async () => {
+    try {
+      setIsUpdating(true)
+      await api.post("/update_local", {
+        localId: local._id,
+        ...formData
+      })
+      
+      // Mutate local object so the UI reflects the change
+      local.LocalName = formData.LocalName;
+      local.LocalPhone = formData.LocalPhone;
+      local.LocalAddress = formData.LocalAddress;
+      local.upiId = formData.upiId;
+      if (local.payment) {
+          local.payment.localUPI = formData.upiId;
+      }
+
+      setIsEditing(false)
+      alert("Profile updated successfully!")
+    } catch (error) {
+      console.error("Error updating local:", error)
+      alert("Failed to update profile. Please try again.")
+    } finally {
+      setIsUpdating(false)
+    }
+  }
+
+  const handleChange = (e) => {
+    setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }))
+  }
 
   return (
     <div className="fixed inset-0 z-40 overflow-hidden">
@@ -54,12 +104,23 @@ const LocalDetailsModal = ({ isOpen, onClose, local, onDelete }) => {
             {/* Avatar + Name */}
             <div className="flex items-center gap-4">
               <div className="w-14 h-14 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-white text-2xl font-bold border-2 border-white/30">
-                {(local.LocalName || "U").charAt(0).toUpperCase()}
+                {(formData.LocalName || local.LocalName || "U").charAt(0).toUpperCase()}
               </div>
               <div className="flex-1 min-w-0">
-                <h3 className="text-xl font-bold text-white truncate">
-                  {local.LocalName || "Unnamed"}
-                </h3>
+                {isEditing ? (
+                  <input 
+                    type="text" 
+                    name="LocalName"
+                    value={formData.LocalName}
+                    onChange={handleChange}
+                    className="w-full text-xl font-bold text-gray-900 bg-white rounded px-2 py-1 mb-1 focus:outline-none"
+                    placeholder="Name"
+                  />
+                ) : (
+                  <h3 className="text-xl font-bold text-white truncate">
+                    {local.LocalName || "Unnamed"}
+                  </h3>
+                )}
                 <div className="flex items-center gap-2 mt-0.5">
                   <span className="bg-white/20 text-white text-xs font-medium px-2 py-0.5 rounded-full">
                     ID: {local.LocalID}
@@ -75,22 +136,6 @@ const LocalDetailsModal = ({ isOpen, onClose, local, onDelete }) => {
 
           {/* ─── Scrollable Content Area ─── */}
           <div className="flex-1 overflow-y-auto pb-4">
-            {/* ─── Quick Stats ─── */}
-            <div className="grid grid-cols-3 gap-0 border-b border-gray-100 bg-gray-50/50">
-              <div className="text-center py-4 border-r border-gray-100">
-                <p className="text-xl font-bold text-blue-600">{local.totalAssignedQuantity || 0}</p>
-                <p className="text-[10px] text-gray-500 font-bold uppercase tracking-wider mt-0.5">Assigned</p>
-              </div>
-              <div className="text-center py-4 border-r border-gray-100">
-                <p className="text-xl font-bold text-green-600">{local.totalReturnedQuantity || 0}</p>
-                <p className="text-[10px] text-gray-500 font-bold uppercase tracking-wider mt-0.5">Returned</p>
-              </div>
-              <div className="text-center py-4">
-                <p className="text-xl font-bold text-orange-600">{pendingQuantity}</p>
-                <p className="text-[10px] text-gray-500 font-bold uppercase tracking-wider mt-0.5">Pending</p>
-              </div>
-            </div>
-
             {/* ─── Details ─── */}
             <div className="px-6 py-5 space-y-6">
               {/* Phone */}
@@ -99,8 +144,18 @@ const LocalDetailsModal = ({ isOpen, onClose, local, onDelete }) => {
                   <MdPhone className="text-blue-600 text-xl" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-[11px] text-gray-400 font-bold uppercase tracking-widest">Phone Number</p>
-                  <p className="text-base font-bold text-gray-900 truncate tracking-tight">{local.LocalPhone || "N/A"}</p>
+                  <p className="text-[11px] text-gray-400 font-bold uppercase tracking-widest mb-1">Phone Number</p>
+                  {isEditing ? (
+                    <input 
+                      type="tel"
+                      name="LocalPhone"
+                      value={formData.LocalPhone}
+                      onChange={handleChange}
+                      className="w-full px-3 py-1.5 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 text-base font-bold text-gray-900"
+                    />
+                  ) : (
+                    <p className="text-base font-bold text-gray-900 truncate tracking-tight">{local.LocalPhone || "N/A"}</p>
+                  )}
                 </div>
               </div>
 
@@ -110,29 +165,54 @@ const LocalDetailsModal = ({ isOpen, onClose, local, onDelete }) => {
                   <MdLocationOn className="text-purple-600 text-xl" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-[11px] text-gray-400 font-bold uppercase tracking-widest">Address</p>
-                  <p className="text-base font-semibold text-gray-900 leading-relaxed">{local.LocalAddress || "N/A"}</p>
+                  <p className="text-[11px] text-gray-400 font-bold uppercase tracking-widest mb-1">Address</p>
+                  {isEditing ? (
+                    <textarea 
+                      name="LocalAddress"
+                      value={formData.LocalAddress}
+                      onChange={handleChange}
+                      rows="2"
+                      className="w-full px-3 py-1.5 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-purple-500 text-base font-semibold text-gray-900 resize-none"
+                    />
+                  ) : (
+                    <p className="text-base font-semibold text-gray-900 leading-relaxed">{local.LocalAddress || "N/A"}</p>
+                  )}
                 </div>
               </div>
 
-              {/* Payment Info (if available) */}
-              {local.payment && (
+              {/* UPI ID */}
+              <div className="flex items-start gap-4">
+                <div className="w-10 h-10 rounded-xl bg-green-50 flex items-center justify-center flex-shrink-0 mt-0.5 shadow-sm border border-green-100">
+                  <MdPayment className="text-green-600 text-xl" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-[11px] text-gray-400 font-bold uppercase tracking-widest mb-1">UPI ID</p>
+                  {isEditing ? (
+                    <input 
+                      type="text"
+                      name="upiId"
+                      value={formData.upiId}
+                      onChange={handleChange}
+                      className="w-full px-3 py-1.5 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-green-500 text-base font-semibold text-gray-900"
+                    />
+                  ) : (
+                    <p className="text-base font-semibold text-gray-900 leading-relaxed">{local.upiId || (local.payment && local.payment.localUPI) || "N/A"}</p>
+                  )}
+                </div>
+              </div>
+
+              {/* Payment Info (if available and not editing, keep amounts but remove UPI ID duplicate) */}
+              {local.payment && !isEditing && (
                 <div className="bg-gray-50/80 rounded-2xl p-5 border border-gray-100 shadow-inner">
                   <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-4">Payment Information</p>
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-1">
-                      <p className="text-[10px] text-gray-500 font-bold uppercase">UPI ID</p>
-                      <p className="text-sm font-bold text-gray-900 truncate">{local.payment.localUPI || "N/A"}</p>
-                    </div>
-                    <div className="space-y-1">
                       <p className="text-[10px] text-gray-500 font-bold uppercase">UPI Amount</p>
                       <p className="text-sm font-bold text-blue-600">₹{local.payment.UPIAmount || 0}</p>
                     </div>
-                    <div className="col-span-2 pt-2 border-t border-gray-200 mt-2">
-                      <div className="flex justify-between items-center">
-                        <p className="text-[10px] text-gray-500 font-bold uppercase">Cash Amount</p>
-                        <p className="text-base font-bold text-green-600">₹{local.payment.cashAmount || 0}</p>
-                      </div>
+                    <div className="space-y-1">
+                      <p className="text-[10px] text-gray-500 font-bold uppercase">Cash Amount</p>
+                      <p className="text-sm font-bold text-green-600">₹{local.payment.cashAmount || 0}</p>
                     </div>
                   </div>
                 </div>
@@ -142,23 +222,45 @@ const LocalDetailsModal = ({ isOpen, onClose, local, onDelete }) => {
 
           {/* ─── Sticky Action Footer ─── */}
           <div className="sticky bottom-0 bg-white border-t border-gray-100 p-5 shadow-[0_-10px_20px_rgba(0,0,0,0.02)]">
-            <div className="grid grid-cols-2 gap-4">
-              <button
-                disabled={isDeleting}
-                className="flex items-center justify-center gap-2 px-6 py-4 bg-orange-500 text-white rounded-2xl text-base font-bold shadow-lg shadow-orange-500/20 active:scale-[0.98] transition-all disabled:opacity-50"
-              >
-                <MdEdit className="text-xl" />
-                Edit Profile
-              </button>
-              <button
-                onClick={() => setShowConfirmDelete(true)}
-                disabled={isDeleting}
-                className="flex items-center justify-center gap-2 px-6 py-4 bg-red-50 text-red-600 rounded-2xl text-base font-bold border border-red-100 active:scale-[0.98] transition-all disabled:opacity-50"
-              >
-                <IoTrash className="text-xl" />
-                Delete
-              </button>
-            </div>
+            {isEditing ? (
+              <div className="grid grid-cols-2 gap-4">
+                <button
+                  onClick={handleUpdate}
+                  disabled={isUpdating}
+                  className="flex items-center justify-center gap-2 px-6 py-4 bg-green-500 text-white rounded-2xl text-base font-bold shadow-lg shadow-green-500/20 active:scale-[0.98] transition-all disabled:opacity-50"
+                >
+                  <MdCheck className="text-xl" />
+                  {isUpdating ? "Saving..." : "Save"}
+                </button>
+                <button
+                  onClick={() => setIsEditing(false)}
+                  disabled={isUpdating}
+                  className="flex items-center justify-center gap-2 px-6 py-4 bg-gray-100 text-gray-700 rounded-2xl text-base font-bold border border-gray-200 active:scale-[0.98] transition-all disabled:opacity-50"
+                >
+                  <MdCancel className="text-xl" />
+                  Cancel
+                </button>
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 gap-4">
+                <button
+                  onClick={() => setIsEditing(true)}
+                  disabled={isDeleting}
+                  className="flex items-center justify-center gap-2 px-6 py-4 bg-orange-500 text-white rounded-2xl text-base font-bold shadow-lg shadow-orange-500/20 active:scale-[0.98] transition-all disabled:opacity-50"
+                >
+                  <MdEdit className="text-xl" />
+                  Edit Profile
+                </button>
+                <button
+                  onClick={() => setShowConfirmDelete(true)}
+                  disabled={isDeleting}
+                  className="flex items-center justify-center gap-2 px-6 py-4 bg-red-50 text-red-600 rounded-2xl text-base font-bold border border-red-100 active:scale-[0.98] transition-all disabled:opacity-50"
+                >
+                  <IoTrash className="text-xl" />
+                  Delete
+                </button>
+              </div>
+            )}
           </div>
 
           {/* ─── Delete Confirmation ─── */}
