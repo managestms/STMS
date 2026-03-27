@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom"
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom"
 import { ThemeProvider } from "./context/ThemeContext"
 import { LanguageProvider } from "./context/LanguageContext"
 
@@ -24,7 +24,8 @@ function App() {
             <Route path="/login" element={<Login />} />
 
             {/* admin routes */}
-            <Route path="/admin/dashboard" element={<A_Dashboard />} />
+            <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
+            <Route path="/admin/:page" element={<A_Dashboard />} />
 
             {/* operator routes */}
             <Route path="/operator/dashboard" element={<O_Dashboard />} />

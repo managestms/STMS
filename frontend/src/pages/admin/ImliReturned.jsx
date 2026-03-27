@@ -1,10 +1,9 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { MdKeyboardReturn, MdSearch, MdPerson, MdScale, MdCancel, MdCheck, MdSchedule, MdLocationOn, MdInventory } from 'react-icons/md'
 import api from "../../api/axios"
 import toast from "react-hot-toast"
-import SuccessModal from "../../components/common/SuccessModal"
 import { useLang } from "../../context/LanguageContext"
 import T from "../../i18n/T"
 
@@ -17,11 +16,14 @@ const ImliReturned = () => {
   const [allLocals, setAllLocals] = useState([])
   const [filteredLocals, setFilteredLocals] = useState([])
   const [showDropdown, setShowDropdown] = useState(false)
+  const [highlightedIndex, setHighlightedIndex] = useState(-1)
+  const quantityInputRef = useRef(null)
+  const dropdownRef = useRef(null)
   const [selectedLocal, setSelectedLocal] = useState(null)
   const [loading, setLoading] = useState(false)
   const [fetchingLocals, setFetchingLocals] = useState(true)
-  const [showSuccessModal, setShowSuccessModal] = useState(false)
-  const [lastReturnedData, setLastReturnedData] = useState(null)
+  const [assignmentHistory, setAssignmentHistory] = useState([])
+  const [historyLoading, setHistoryLoading] = useState(false)
 
   // Fetch all locals on component mount
   useEffect(() => {
@@ -56,6 +58,7 @@ const ImliReturned = () => {
       setFilteredLocals([])
       setShowDropdown(false)
       setSelectedLocal(null)
+      setHighlightedIndex(-1)
     } else {
       // Filter locals based on LocalID or LocalName
       const filtered = allLocals.filter(
@@ -65,6 +68,59 @@ const ImliReturned = () => {
       )
       setFilteredLocals(filtered)
       setShowDropdown(filtered.length > 0)
+      setHighlightedIndex(-1)
+    }
+  }
+
+  const handleKeyDown = (e) => {
+    if (!showDropdown || filteredLocals.length === 0) return;
+
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      setHighlightedIndex((prev) => 
+        prev < filteredLocals.length - 1 ? prev + 1 : prev
+      );
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      setHighlightedIndex((prev) => (prev > 0 ? prev - 1 : 0));
+    } else if (e.key === "Enter") {
+      e.preventDefault();
+      if (highlightedIndex >= 0 && highlightedIndex < filteredLocals.length) {
+        handleSelectLocal(filteredLocals[highlightedIndex]);
+      } else if (filteredLocals.length > 0) {
+        handleSelectLocal(filteredLocals[0]);
+      }
+    }
+  }
+
+  // Scroll to highlighted item in dropdown
+  useEffect(() => {
+    if (showDropdown && highlightedIndex >= 0 && dropdownRef.current) {
+      const parent = dropdownRef.current;
+      const child = parent.children[highlightedIndex];
+      if (child) {
+        const parentRect = parent.getBoundingClientRect();
+        const childRect = child.getBoundingClientRect();
+        if (childRect.bottom > parentRect.bottom) {
+          parent.scrollTop += childRect.bottom - parentRect.bottom;
+        } else if (childRect.top < parentRect.top) {
+          parent.scrollTop -= parentRect.top - childRect.top;
+        }
+      }
+    }
+  }, [highlightedIndex, showDropdown])
+
+  // Fetch assignment history when a local is selected
+  const fetchAssignmentHistory = async (localID) => {
+    try {
+      setHistoryLoading(true)
+      const response = await api.get("/assignment-history", { params: { localID } })
+      setAssignmentHistory(response.data?.data || [])
+    } catch (error) {
+      console.error("Error fetching assignment history:", error)
+      setAssignmentHistory([])
+    } finally {
+      setHistoryLoading(false)
     }
   }
 
@@ -77,6 +133,16 @@ const ImliReturned = () => {
     }))
     setShowDropdown(false)
     setFilteredLocals([])
+    setHighlightedIndex(-1)
+    fetchAssignmentHistory(local.LocalID)
+    
+    // Auto focus and scroll to quantity input after state updates
+    setTimeout(() => {
+      if (quantityInputRef.current) {
+        quantityInputRef.current.focus()
+        quantityInputRef.current.scrollIntoView({ behavior: "smooth", block: "center" })
+      }
+    }, 50)
   }
 
   const handleQuantityChange = (e) => {
@@ -104,8 +170,10 @@ const ImliReturned = () => {
         return
       }
 
-      if (parseFloat(formData.returnedQuantity) > selectedLocal.totalAssignedQuantity) {
-        toast.error(`Cannot return more than ${selectedLocal.totalAssignedQuantity} KG assigned`)
+      const maxReturnable = selectedLocal.totalReturnedQuantity > 0 ? 0 : selectedLocal.totalAssignedQuantity;
+
+      if (parseFloat(formData.returnedQuantity) > maxReturnable) {
+        toast.error(`Cannot return more than ${maxReturnable} KG. (Assigned amount is fully cleaned or zeroed out).`)
         setLoading(false)
         return
       }
@@ -133,15 +201,12 @@ const ImliReturned = () => {
         )
       )
 
-      setLastReturnedData({
-        quantity: returnedQuantity,
-        localName: selectedLocal.LocalName
-      })
-      setShowSuccessModal(true)
+      toast.success(`${returnedQuantity} KG of Cleaned Imli successfully returned from ${selectedLocal.LocalName}.`)
 
       setFormData({ LocalID: "", returnedQuantity: "" })
       setSelectedLocal(null)
       setShowDropdown(false)
+      setAssignmentHistory([])
     } catch (error) {
       const errorMsg = error.response?.data?.message || "Failed to return imli"
       toast.error(`${errorMsg}`)
@@ -155,6 +220,7 @@ const ImliReturned = () => {
     setFormData({ LocalID: "", returnedQuantity: "" })
     setSelectedLocal(null)
     setShowDropdown(false)
+    setAssignmentHistory([])
   }
 
   return (
@@ -203,6 +269,7 @@ const ImliReturned = () => {
                       placeholder="Search by Local ID or Name (e.g., 202 or Faraaz)"
                       value={formData.LocalID}
                       onChange={handleSearchChange}
+                      onKeyDown={handleKeyDown}
                       onFocus={() => filteredLocals.length > 0 && setShowDropdown(true)}
                       className="w-full px-4 py-3 pl-10 bg-white border border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all duration-200 text-base font-medium"
                       style={{ fontSize: '16px' }}
@@ -213,12 +280,17 @@ const ImliReturned = () => {
 
                   {/* Dropdown List */}
                   {showDropdown && filteredLocals.length > 0 && (
-                    <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-60 overflow-y-auto">
-                      {filteredLocals.map((local) => (
+                    <div 
+                      ref={dropdownRef}
+                      className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-60 overflow-y-auto"
+                    >
+                      {filteredLocals.map((local, index) => (
                         <div
                           key={local._id}
                           onClick={() => handleSelectLocal(local)}
-                          className="px-4 py-3 hover:bg-orange-50 cursor-pointer border-b border-gray-50 last:border-b-0 transition-colors duration-150"
+                          className={`px-4 py-3 cursor-pointer border-b border-gray-50 last:border-b-0 transition-colors duration-150 ${
+                            highlightedIndex === index ? 'bg-orange-100' : 'hover:bg-orange-50'
+                          }`}
                         >
                           <div className="flex items-center gap-3">
                             <div className="bg-orange-100 p-1.5 rounded text-orange-600">
@@ -227,7 +299,7 @@ const ImliReturned = () => {
                             <div className="flex-1">
                               <div className="font-semibold text-gray-900 text-sm">{local.LocalID} - {local.LocalName}</div>
                               <div className="text-xs text-gray-500 mt-0.5">
-                                Assigned: <span className="font-medium text-gray-700">{local.totalAssignedQuantity} KG</span>
+                                Assigned: <span className="font-medium text-gray-700">{local.totalReturnedQuantity > 0 ? 0 : local.totalAssignedQuantity} KG</span>
                               </div>
                             </div>
                           </div>
@@ -237,26 +309,69 @@ const ImliReturned = () => {
                   )}
                 </div>
 
-                {/* Selected Local Display */}
+                {/* Selected Local Display & Assignment History */}
                 {selectedLocal && (
-                  <div className="p-4 md:p-5 bg-orange-50 rounded-lg border border-orange-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-                    <div className="flex items-center gap-3">
-                      <div className="bg-white p-2 rounded-full border border-orange-200 shadow-sm">
-                        <MdCheck className="text-orange-600 text-lg" />
+                  <div className="space-y-4">
+                    <div className="p-4 md:p-5 bg-orange-50 rounded-lg border border-orange-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                      <div className="flex items-center gap-3">
+                        <div className="bg-white p-2 rounded-full border border-orange-200 shadow-sm">
+                          <MdCheck className="text-orange-600 text-lg" />
+                        </div>
+                        <div>
+                          <p className="text-gray-900 font-bold text-sm md:text-base">
+                            {selectedLocal.LocalName}
+                          </p>
+                          <p className="text-gray-500 text-xs font-medium">ID: {selectedLocal.LocalID}</p>
+                        </div>
                       </div>
-                      <div>
-                        <p className="text-gray-900 font-bold text-sm md:text-base">
-                          {selectedLocal.LocalName}
-                        </p>
-                        <p className="text-gray-500 text-xs font-medium">ID: {selectedLocal.LocalID}</p>
+                      <div className="bg-white px-3 py-1.5 rounded border border-orange-200/50 shadow-sm ml-11 sm:ml-0">
+                        <span className="text-xs text-gray-500 font-medium uppercase tracking-wider mr-2"><T k="Assigned" /></span>
+                        <span className="text-orange-600 font-bold text-base md:text-lg">
+                          {selectedLocal.totalReturnedQuantity > 0 ? 0 : selectedLocal.totalAssignedQuantity} <span className="text-xs text-gray-400 font-normal">KG</span>
+                        </span>
                       </div>
                     </div>
-                    <div className="bg-white px-3 py-1.5 rounded border border-orange-200/50 shadow-sm ml-11 sm:ml-0">
-                      <span className="text-xs text-gray-500 font-medium uppercase tracking-wider mr-2"><T k="Assigned" /></span>
-                      <span className="text-orange-600 font-bold text-base md:text-lg">
-                        {selectedLocal.totalAssignedQuantity} <span className="text-xs text-gray-400 font-normal">KG</span>
-                      </span>
-                    </div>
+
+                    {/* Assignment History Table */}
+                    {(selectedLocal.totalReturnedQuantity > 0 ? 0 : selectedLocal.totalAssignedQuantity) > 0 && (
+                      <div className="bg-white border text-sm border-gray-200 rounded-lg overflow-hidden shadow-sm">
+                        <div className="bg-gray-50 px-4 py-3 border-b border-gray-200 flex justify-between items-center">
+                          <h4 className="text-xs font-bold text-gray-700 uppercase tracking-wider">Assignment History</h4>
+                        </div>
+                        {historyLoading ? (
+                          <div className="p-6 flex flex-col items-center justify-center text-gray-500 font-medium space-y-3">
+                            <div className="w-6 h-6 border-2 border-orange-500 border-t-transparent rounded-full animate-spin"></div>
+                            <span>Loading history...</span>
+                          </div>
+                        ) : assignmentHistory.length > 0 ? (
+                          <div className="overflow-x-auto">
+                            <table className="w-full text-left bg-white">
+                              <thead className="bg-white border-b border-gray-100 text-gray-500 uppercase text-[10px] sm:text-xs font-semibold tracking-wider">
+                                <tr>
+                                  <th className="px-4 py-3 shrink-0">Date & Time</th>
+                                  <th className="px-4 py-3 text-right">Assigned Quantity</th>
+                                </tr>
+                              </thead>
+                              <tbody className="divide-y divide-gray-50 text-gray-700">
+                                {assignmentHistory.map((entry, idx) => (
+                                  <tr key={entry._id || idx} className="hover:bg-gray-50/50 transition-colors">
+                                    <td className="px-4 py-3">
+                                      <div className="font-semibold text-gray-900">{new Date(entry.createdAt).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}</div>
+                                      <div className="text-[10px] sm:text-xs text-gray-400 mt-0.5">{new Date(entry.createdAt).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: true })}</div>
+                                    </td>
+                                    <td className="px-4 py-3 text-right">
+                                      <span className="inline-block bg-orange-50 text-orange-700 px-2.5 py-1 rounded-md font-bold">{entry.assignedQuantity} <span className="text-[10px] font-medium text-orange-500">KG</span></span>
+                                    </td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </div>
+                        ) : (
+                          <div className="p-6 text-center text-gray-500 text-sm">No assignment records found for this local.</div>
+                        )}
+                      </div>
+                    )}
                   </div>
                 )}
 
@@ -269,10 +384,11 @@ const ImliReturned = () => {
                     </label>
                     <div className="relative">
                       <input
+                        ref={quantityInputRef}
                         type="number"
                         step="0.01"
                         min="0"
-                        max={selectedLocal.totalAssignedQuantity}
+                        max={selectedLocal.totalReturnedQuantity > 0 ? 0 : selectedLocal.totalAssignedQuantity}
                         placeholder="0.00"
                         value={formData.returnedQuantity}
                         onChange={handleQuantityChange}
@@ -321,13 +437,6 @@ const ImliReturned = () => {
         </div>
       </div>
 
-      <SuccessModal
-        isOpen={showSuccessModal}
-        onClose={() => setShowSuccessModal(false)}
-        title="Return Successful!"
-        message={`${lastReturnedData?.quantity} KG of Cleaned Imli has been successfully returned from ${lastReturnedData?.localName}.`}
-        subMessage="The inventory and assignment records have been updated."
-      />
     </div>
   )
 }

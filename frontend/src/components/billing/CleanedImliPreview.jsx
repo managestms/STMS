@@ -5,6 +5,7 @@ import { MdArrowBack, MdSend, MdPerson, MdReceipt } from 'react-icons/md'
 export default function CleanedImliPreview({ imliData, onBack, onSubmit, isSubmitting }) {
     const { senderName = "", rows = [] } = imliData
 
+    const totalQuantity = rows.reduce((sum, r) => sum + (parseFloat(r.quantity) || 0), 0)
     const totalWeight = rows.reduce((sum, r) => sum + (parseFloat(r.weight) || 0), 0)
     const totalAmount = rows.reduce((sum, r) => sum + (parseFloat(r.amount) || 0), 0)
 
@@ -70,7 +71,11 @@ export default function CleanedImliPreview({ imliData, onBack, onSubmit, isSubmi
                         </tbody>
                         <tfoot>
                             <tr className="bg-orange-50/80 border-t-2 border-orange-200">
-                                <td className="px-3 md:px-5 py-3 font-bold text-gray-700 uppercase text-xs md:text-sm" colSpan={4}>Total</td>
+                                <td className="px-3 md:px-5 py-3 font-bold text-gray-700 uppercase text-xs md:text-sm" colSpan={2}>Total</td>
+                                <td className="px-3 md:px-5 py-3 font-bold text-orange-700 text-xs md:text-sm">
+                                    {totalQuantity}
+                                </td>
+                                <td className="px-3 md:px-5 py-3 font-bold text-gray-500 text-xs md:text-sm">—</td>
                                 <td className="px-3 md:px-5 py-3 font-bold text-orange-700 text-xs md:text-sm">
                                     {totalWeight.toLocaleString("en-IN", { minimumFractionDigits: 2 })} kg
                                 </td>

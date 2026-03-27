@@ -1,10 +1,9 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { MdAssignment, MdSearch, MdPerson, MdScale, MdCancel, MdCheck, MdSchedule, MdLocationOn } from 'react-icons/md'
 import api from "../../api/axios"
 import toast from "react-hot-toast"
-import SuccessModal from "../../components/common/SuccessModal"
 import { useLang } from "../../context/LanguageContext"
 import T from "../../i18n/T"
 
@@ -17,11 +16,12 @@ const AssignImli = ({ prefilledLocalId, prefilledLocal }) => {
   const [allLocals, setAllLocals] = useState([])
   const [filteredLocals, setFilteredLocals] = useState([])
   const [showDropdown, setShowDropdown] = useState(false)
+  const [highlightedIndex, setHighlightedIndex] = useState(-1)
+  const quantityInputRef = useRef(null)
+  const dropdownRef = useRef(null)
   const [selectedLocal, setSelectedLocal] = useState(null)
   const [loading, setLoading] = useState(false)
   const [fetchingLocals, setFetchingLocals] = useState(true)
-  const [showSuccessModal, setShowSuccessModal] = useState(false)
-  const [lastAssignedData, setLastAssignedData] = useState(null)
 
   // Fetch all locals on component mount
   useEffect(() => {
@@ -69,6 +69,7 @@ const AssignImli = ({ prefilledLocalId, prefilledLocal }) => {
       setFilteredLocals([])
       setShowDropdown(false)
       setSelectedLocal(null)
+      setHighlightedIndex(-1)
     } else {
       // Filter locals based on LocalID or LocalName
       const filtered = allLocals.filter(
@@ -78,8 +79,47 @@ const AssignImli = ({ prefilledLocalId, prefilledLocal }) => {
       )
       setFilteredLocals(filtered)
       setShowDropdown(filtered.length > 0)
+      setHighlightedIndex(-1)
     }
   }
+
+  const handleKeyDown = (e) => {
+    if (!showDropdown || filteredLocals.length === 0) return;
+
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      setHighlightedIndex((prev) => 
+        prev < filteredLocals.length - 1 ? prev + 1 : prev
+      );
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      setHighlightedIndex((prev) => (prev > 0 ? prev - 1 : 0));
+    } else if (e.key === "Enter") {
+      e.preventDefault();
+      if (highlightedIndex >= 0 && highlightedIndex < filteredLocals.length) {
+        handleSelectLocal(filteredLocals[highlightedIndex]);
+      } else if (filteredLocals.length > 0) {
+        handleSelectLocal(filteredLocals[0]);
+      }
+    }
+  }
+
+  // Scroll to highlighted item in dropdown
+  useEffect(() => {
+    if (showDropdown && highlightedIndex >= 0 && dropdownRef.current) {
+      const parent = dropdownRef.current;
+      const child = parent.children[highlightedIndex];
+      if (child) {
+        const parentRect = parent.getBoundingClientRect();
+        const childRect = child.getBoundingClientRect();
+        if (childRect.bottom > parentRect.bottom) {
+          parent.scrollTop += childRect.bottom - parentRect.bottom;
+        } else if (childRect.top < parentRect.top) {
+          parent.scrollTop -= parentRect.top - childRect.top;
+        }
+      }
+    }
+  }, [highlightedIndex, showDropdown])
 
   // Handle local selection from dropdown
   const handleSelectLocal = (local) => {
@@ -90,6 +130,15 @@ const AssignImli = ({ prefilledLocalId, prefilledLocal }) => {
     }))
     setShowDropdown(false)
     setFilteredLocals([])
+    setHighlightedIndex(-1)
+    
+    // Auto focus and scroll to quantity input after state updates
+    setTimeout(() => {
+      if (quantityInputRef.current) {
+        quantityInputRef.current.focus()
+        quantityInputRef.current.scrollIntoView({ behavior: "smooth", block: "center" })
+      }
+    }, 50)
   }
 
   const handleQuantityChange = (e) => {
@@ -123,11 +172,7 @@ const AssignImli = ({ prefilledLocalId, prefilledLocal }) => {
         assignedQuantity: parseFloat(formData.assignedQuantity),
       })
 
-      setLastAssignedData({
-        quantity: formData.assignedQuantity,
-        localName: selectedLocal.LocalName
-      })
-      setShowSuccessModal(true)
+      toast.success(`${formData.assignedQuantity} KG of Raw Imli has been successfully assigned to ${selectedLocal.LocalName}.`)
 
       // Reset form but keep modal open
       setFormData({ LocalID: "", assignedQuantity: "" })
@@ -197,6 +242,7 @@ const AssignImli = ({ prefilledLocalId, prefilledLocal }) => {
                       placeholder="Search by Local ID or Name (e.g., 202 or Faraaz)"
                       value={formData.LocalID}
                       onChange={handleSearchChange}
+                      onKeyDown={handleKeyDown}
                       onFocus={() => filteredLocals.length > 0 && setShowDropdown(true)}
                       className="w-full px-4 py-3 pl-10 bg-white border border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all duration-200 text-base font-medium"
                       style={{ fontSize: '16px' }}
@@ -207,12 +253,17 @@ const AssignImli = ({ prefilledLocalId, prefilledLocal }) => {
 
                   {/* Dropdown List */}
                   {showDropdown && filteredLocals.length > 0 && (
-                    <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-60 overflow-y-auto">
-                      {filteredLocals.map((local) => (
+                    <div 
+                      ref={dropdownRef}
+                      className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-60 overflow-y-auto"
+                    >
+                      {filteredLocals.map((local, index) => (
                         <div
                           key={local._id}
                           onClick={() => handleSelectLocal(local)}
-                          className="px-4 py-3 hover:bg-orange-50 cursor-pointer border-b border-gray-50 last:border-b-0 transition-colors duration-150"
+                          className={`px-4 py-3 cursor-pointer border-b border-gray-50 last:border-b-0 transition-colors duration-150 ${
+                            highlightedIndex === index ? 'bg-orange-100' : 'hover:bg-orange-50'
+                          }`}
                         >
                           <div className="flex items-center gap-3">
                             <div className="bg-orange-100 p-1.5 rounded text-orange-600">
@@ -260,6 +311,7 @@ const AssignImli = ({ prefilledLocalId, prefilledLocal }) => {
                   </label>
                   <div className="relative">
                     <input
+                      ref={quantityInputRef}
                       type="number"
                       step="0.01"
                       min="0"
@@ -311,13 +363,6 @@ const AssignImli = ({ prefilledLocalId, prefilledLocal }) => {
         </div>
       </div>
 
-      <SuccessModal
-        isOpen={showSuccessModal}
-        onClose={() => setShowSuccessModal(false)}
-        title="Assignment Successful!"
-        message={`${lastAssignedData?.quantity} KG of Raw Imli has been successfully assigned to ${lastAssignedData?.localName}.`}
-        subMessage="The inventory has been updated accordingly."
-      />
     </div>
   )
 }

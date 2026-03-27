@@ -7,7 +7,10 @@ import { Toaster } from "react-hot-toast"   // ✅ ADD THIS
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
-    <Toaster position="top-right" />          {/* ✅ ADD THIS */}
+    <Toaster 
+      position="top-right" 
+      containerStyle={{ top: '70px', right: '20px' }} 
+    />
     <App />
   </StrictMode>
 )

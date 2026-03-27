@@ -1,7 +1,8 @@
 "use client"
 
-import { useState } from 'react'
-import { MdArrowForward, MdArrowBack, MdAdd, MdDelete, MdPerson } from 'react-icons/md'
+import { useState, useEffect } from 'react'
+import { MdArrowForward, MdArrowBack, MdAdd, MdDelete, MdPerson, MdWarning } from 'react-icons/md'
+import api from '../../api/axios'
 
 const EMPTY_ROW = { product: "", quantity: "", unit: "", rate: "", weight: "", amount: "" }
 
@@ -27,6 +28,35 @@ export default function CleanedImliForm({ imliData, setImliData, onNext, onBack 
     // Track which rows are using manual/custom unit input
     const [manualUnitRows, setManualUnitRows] = useState({})
 
+    const [availableStock, setAvailableStock] = useState(null)
+    const [stockLoading, setStockLoading] = useState(true)
+
+    useEffect(() => {
+        const fetchStock = async () => {
+            try {
+                const [localsRes, rawImliRes] = await Promise.all([
+                    api.get("/return_local"),
+                    api.get("/getRawImli")
+                ]);
+
+                let inProgressCleaned = 0;
+                if (localsRes.data && localsRes.data.data) {
+                    const locals = localsRes.data.data;
+                    inProgressCleaned = locals.reduce((acc, local) => acc + (local.totalReturnedQuantity || 0), 0);
+                }
+
+                const historicalCleaned = rawImliRes.data?.data?.totalCleanedImli || 0;
+                setAvailableStock(historicalCleaned + inProgressCleaned);
+            } catch (error) {
+                console.error("Error fetching available stock:", error);
+                setAvailableStock(0);
+            } finally {
+                setStockLoading(false);
+            }
+        };
+        fetchStock();
+    }, []);
+
     const updateSenderName = (value) => {
         setImliData({ ...imliData, senderName: value, rows })
     }
@@ -36,11 +66,11 @@ export default function CleanedImliForm({ imliData, setImliData, onNext, onBack 
             if (i !== index) return row
             const newRow = { ...row, [field]: value }
 
-            // Auto-calculate amount = quantity × rate
-            if (field === "quantity" || field === "rate") {
-                const qty = parseFloat(field === "quantity" ? value : row.quantity) || 0
+            // Auto-calculate amount = weight × rate
+            if (field === "weight" || field === "rate") {
+                const weight = parseFloat(field === "weight" ? value : row.weight) || 0
                 const rate = parseFloat(field === "rate" ? value : row.rate) || 0
-                newRow.amount = qty * rate > 0 ? (qty * rate).toString() : ""
+                newRow.amount = weight * rate > 0 ? (weight * rate).toString() : ""
             }
 
             return newRow
@@ -83,13 +113,15 @@ export default function CleanedImliForm({ imliData, setImliData, onNext, onBack 
         })
     }
 
-    const isValid = senderName.trim() && rows.every(
-        (r) => r.product && r.quantity && r.rate && r.amount
-    )
-
-    // Calculate totals
+    const totalQuantity = rows.reduce((sum, r) => sum + (parseFloat(r.quantity) || 0), 0)
     const totalWeight = rows.reduce((sum, r) => sum + (parseFloat(r.weight) || 0), 0)
     const totalAmount = rows.reduce((sum, r) => sum + (parseFloat(r.amount) || 0), 0)
+
+    const isStockExceeded = !stockLoading && availableStock !== null && totalWeight > availableStock
+
+    const isValid = senderName.trim() && rows.every(
+        (r) => r.product && r.quantity && r.rate && r.weight && r.amount
+    ) && totalWeight > 0 && !isStockExceeded
 
     return (
         <div className="space-y-5 md:space-y-6">
@@ -115,6 +147,16 @@ export default function CleanedImliForm({ imliData, setImliData, onNext, onBack 
                     required
                 />
             </div>
+
+            {/* Show error if weight exceeds stock */}
+            {isStockExceeded && (
+                <div className="bg-red-50 text-red-700 p-3 sm:p-4 rounded-xl flex items-center gap-3 text-sm font-medium border border-red-200">
+                    <div className="bg-red-100 p-1.5 rounded-lg shrink-0">
+                        <MdWarning className="text-xl text-red-600" />
+                    </div>
+                    <p>Cannot bill more than available stock <span className="font-bold">({availableStock.toLocaleString("en-IN", { minimumFractionDigits: 2 })} kg available)</span>.</p>
+                </div>
+            )}
 
             {/* Items Table */}
             {/* ─── Desktop Table (hidden on mobile) ─── */}
@@ -241,7 +283,7 @@ export default function CleanedImliForm({ imliData, setImliData, onNext, onBack 
                 {/* Totals Row */}
                 <div className="grid grid-cols-[1.8fr_1fr_1fr_1fr_1.2fr_auto] items-center bg-orange-50/80 border-t-2 border-orange-200">
                     <div className="px-4 py-3 text-sm font-bold text-gray-700 uppercase">Total</div>
-                    <div className="px-4 py-3 text-sm font-bold text-gray-500">—</div>
+                    <div className="px-4 py-3 text-sm font-bold text-orange-700">{totalQuantity}</div>
                     <div className="px-4 py-3 text-sm font-bold text-gray-500">—</div>
                     <div className="px-4 py-3 text-sm font-bold text-orange-700">
                         {totalWeight.toLocaleString("en-IN", { minimumFractionDigits: 2 })} kg
@@ -370,7 +412,16 @@ export default function CleanedImliForm({ imliData, setImliData, onNext, onBack 
                 <div className="bg-orange-50/70 rounded-xl p-3 flex items-center justify-between mt-2">
                     <div>
                         <p className="text-[11px] font-semibold text-orange-700 uppercase">Total</p>
-                        <p className="text-[10px] text-orange-600/60 font-medium">{totalWeight.toLocaleString("en-IN", { minimumFractionDigits: 2 })} kg</p>
+                        <div className="flex gap-4 mt-0.5">
+                            <div>
+                                <span className="text-[9px] text-orange-600/70 font-semibold uppercase mr-1">Qty</span>
+                                <span className="text-[10px] text-orange-700 font-bold">{totalQuantity}</span>
+                            </div>
+                            <div>
+                                <span className="text-[9px] text-orange-600/70 font-semibold uppercase mr-1">Wt</span>
+                                <span className="text-[10px] text-orange-700 font-bold">{totalWeight.toLocaleString("en-IN", { minimumFractionDigits: 2 })} kg</span>
+                            </div>
+                        </div>
                     </div>
                     <p className="text-lg font-semibold text-orange-700">₹ {totalAmount.toLocaleString("en-IN", { minimumFractionDigits: 2 })}</p>
                 </div>

@@ -254,9 +254,33 @@ export const getAssignmentHistory = asyncHandler(async (req, res) => {
         throw new ApiError(400, "localID is required");
     }
 
+    const local = await localData.findOne({ LocalID: String(localID) });
+    if (!local) {
+        throw new ApiError(404, "Local not found");
+    }
+
+    const currentAssignedTotal = local.totalAssignedQuantity || 0;
+    
+    if (currentAssignedTotal === 0) {
+        return res.status(200).json(
+            new ApiResponse(200, [], "Assignment history fetched (No active assignments)")
+        );
+    }
+
     const assignments = await ImliAssign.find({ localID: String(localID) }).sort({ createdAt: -1 });
 
+    const activeAssignments = [];
+    let sum = 0;
+
+    for (const assignment of assignments) {
+        activeAssignments.push(assignment);
+        sum += assignment.assignedQuantity;
+        if (sum >= currentAssignedTotal) {
+            break;
+        }
+    }
+
     return res.status(200).json(
-        new ApiResponse(200, assignments || [], "Assignment history fetched")
+        new ApiResponse(200, activeAssignments, "Active assignment history fetched")
     );
 });

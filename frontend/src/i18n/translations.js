@@ -161,6 +161,10 @@ const translations = {
     "ID / NAME": "آئی ڈی / نام",
     "QUANTITY": "مقدار",
     "DELIVERED": "فراہم شدہ",
+    "Inventory Overview": "انوینٹری کا جائزہ",
+    "Real-time stock metrics": "حقیقی وقت اسٹاک میٹرکس",
+    "Inventory Distribution": "انوینٹری تقسیم",
+    "Inventory Summary": "انوینٹری خلاصہ",
 
     // ─── Assign Imli ───
     "Assign Imli to Local": "مقامی کو املی تقسیم کریں",

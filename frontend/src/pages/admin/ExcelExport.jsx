@@ -37,31 +37,31 @@ const ExcelExport = () => {
     }, []);
 
     return (
-        <div className="mt-4 md:mt-6 border-t border-gray-100 pt-4 md:pt-6 relative" ref={dropdownRef}>
+        <div className="relative" ref={dropdownRef}>
             <button
                 onClick={() => setIsOpen(!isOpen)}
-                className="w-full bg-green-600 hover:bg-green-700 text-white rounded-lg p-3 md:p-3.5 flex items-center justify-center gap-2 transition-all shadow-md group font-bold text-xs md:text-sm"
+                className="w-full bg-green-50 hover:bg-green-100 text-green-700 border border-green-200 rounded-xl p-3 md:p-4 flex items-center justify-center gap-2 transition-all font-semibold md:text-[15px] group outline-none"
             >
-                <MdDownload className="text-lg" />
-                <T k="Export Excel Report" />
+                <MdDownload className="text-xl group-hover:scale-110 transition-transform" />
+                <T k="Export Reports" />
                 <MdKeyboardArrowDown className={`ml-1 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
             </button>
 
             {isOpen && (
-                <div className="absolute bottom-full left-0 w-full mb-2 bg-white border border-gray-200 rounded-lg shadow-xl z-50 overflow-hidden transform transition-all animate-in fade-in slide-in-from-bottom-2">
+                <div className="absolute top-full left-0 min-w-[200px] w-full mt-2 bg-white border border-gray-200 rounded-lg shadow-xl z-50 overflow-hidden transform transition-all animate-in fade-in slide-in-from-top-2">
                     <button
                         onClick={() => handleDownload("/export/locals", "Locals_Report.xlsx")}
                         className="w-full text-left px-4 py-3 hover:bg-green-50 text-gray-700 text-xs md:text-sm border-b border-gray-100 flex items-center gap-3 transition-colors"
                     >
-                        <MdDownload className="text-green-500" />
-                        <T k="Locals Data Excel" />
+                        <MdDownload className="text-green-500 shrink-0" />
+                        <span className="truncate"><T k="Locals Data Excel" /></span>
                     </button>
                     <button
                         onClick={() => handleDownload("/export/payments", "Payments_Report.xlsx")}
                         className="w-full text-left px-4 py-3 hover:bg-green-50 text-gray-700 text-xs md:text-sm flex items-center gap-3 transition-colors"
                     >
-                        <MdDownload className="text-green-500" />
-                        <T k="Payments Data Excel" />
+                        <MdDownload className="text-green-500 shrink-0" />
+                        <span className="truncate"><T k="Payments Data Excel" /></span>
                     </button>
                 </div>
             )}

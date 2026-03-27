@@ -1,6 +1,7 @@
 "use client"
 
-import { useState, useEffect, useCallback, useRef } from "react"
+import { useState, useEffect, useCallback } from "react"
+import { useParams, useNavigate } from "react-router-dom"
 import Sidebar from "./Sidebar"
 import Header from "./Header"
 import Dashboard from "./Dashboard"
@@ -15,77 +16,31 @@ import Settings from "./Settings"
 import MobileNav from "../../components/common/MobileNav"
 
 const AdminLayout = () => {
-  const [activePage, setActivePage] = useState("dashboard")
+  const { page } = useParams()
+  const navigate = useNavigate()
+  
   const [navigationProps, setNavigationProps] = useState({})
   const [isSidebarCollapsed] = useState(false) // Always expanded
-  const isPopState = useRef(false)
 
-  // ── Browser history integration ──
-  // Replace current entry + add guard entries to prevent escaping to login/landing
+  const activePage = ["dashboard", "addLocals", "addRawImli", "assignImli", "imliReturned", "localsProfile", "payment", "billing", "settings"].includes(page) ? page : "dashboard"
+
   useEffect(() => {
-    const currentUrl = window.location.href
-    // Tag the current entry as our base
-    window.history.replaceState({ page: "dashboard", guard: true }, "", currentUrl)
-    // Push a guard entry (same URL so React Router doesn't navigate away)
-    window.history.pushState({ page: "dashboard" }, "", currentUrl)
-  }, [])
-
-  // Listen for browser back/forward button
-  useEffect(() => {
-    const handlePopState = (event) => {
-      const state = event.state
-
-      // Billing step navigation — let Billing component handle it
-      if (state && state.billingStep !== undefined) {
-        return
-      }
-
-      // Normal page navigation within the app
-      if (state && state.page && !state.guard) {
-        isPopState.current = true
-        setNavigationProps({})
-        setActivePage(state.page)
-        return
-      }
-
-      // Guard entry or unknown state — user trying to leave the app!
-      // Force them back to dashboard
-      const currentUrl = window.location.pathname === "/admin/dashboard"
-        ? window.location.href
-        : "/admin/dashboard"
-
-      // Re-add guard entries to rebuild the buffer
-      window.history.replaceState({ page: "dashboard", guard: true }, "", currentUrl)
-      window.history.pushState({ page: "dashboard" }, "", currentUrl)
-      isPopState.current = true
-      setActivePage("dashboard")
+    if (activePage !== "assignImli") {
+      setNavigationProps({})
     }
-    window.addEventListener("popstate", handlePopState)
-    return () => window.removeEventListener("popstate", handlePopState)
-  }, [])
+  }, [activePage])
 
-  const navigateToAssignImli = (localData) => {
+  const navigateToAssignImli = useCallback((localData) => {
     setNavigationProps({ prefilledLocalId: localData.LocalID, prefilledLocal: localData })
-    setActivePage("assignImli")
-    window.history.pushState({ page: "assignImli" }, "")
-  }
+    navigate("/admin/assignImli")
+  }, [navigate])
 
   const handlePageChange = useCallback((pageId) => {
-    setNavigationProps({}) // Clear navigation props when changing pages normally
-    setActivePage(pageId)
-
-    // Only push history if this is NOT a popstate event (user pressing back)
-    if (isPopState.current) {
-      isPopState.current = false
-      return
-    }
-
-    // Push a new history entry so browser back button works
-    window.history.pushState({ page: pageId }, "")
-  }, [])
+    navigate(`/admin/${pageId}`)
+  }, [navigate])
 
   const pageConfig = {
-    dashboard: { component: Dashboard, title: "Dahsboard", props: { navigateToAssignImli, onPageChange: handlePageChange } },
+    dashboard: { component: Dashboard, title: "Dashboard", props: { navigateToAssignImli, onPageChange: handlePageChange } },
     addLocals: { component: AddLocals, title: "Add Locals", props: {} },
     addRawImli: { component: AddRawImli, title: "Add Raw Imli", props: {} },
     assignImli: { component: AssignImli, title: "Assign Imli", props: navigationProps },
@@ -110,7 +65,7 @@ const AdminLayout = () => {
         <Header
           title={currentPage.title}
         />
-        <div className="flex-1 overflow-auto pb-20 md:pb-0">
+        <div className="flex-1 overflow-y-auto pb-20 md:pb-0">
           <CurrentComponent {...currentPage.props} />
         </div>
       </div>

@@ -119,7 +119,7 @@ const LocalsProfile = ({ navigateToAssignImli }) => {
 
   return (
     <div className="p-3 md:p-6 lg:p-8 bg-white min-h-screen overflow-x-hidden">
-      {/* Search Bar with Icon, Count & Refresh */}
+      {/* Search Bar with Icon & Refresh */}
       <div className="bg-white rounded-xl border border-orange-500/20 shadow-sm p-3 md:p-4 mb-4 md:mb-6">
         <div className="flex flex-wrap md:flex-nowrap items-center gap-2 md:gap-3">
           {/* Icon */}
@@ -139,16 +139,11 @@ const LocalsProfile = ({ navigateToAssignImli }) => {
               style={{ fontSize: '16px' }}
             />
           </div>
-          {/* Count Badge */}
-          <div className="bg-orange-50 px-2 md:px-4 py-1.5 md:py-2 rounded-lg border border-orange-100 flex-shrink-0">
-            <div className="text-xs md:text-sm text-gray-700 font-medium">
-              <span className="font-bold text-orange-600">{filteredLocals.length}</span> <span className="hidden sm:inline"><T k="locals" /></span>
-            </div>
-          </div>
+
           {/* Refresh Button */}
           <button
             onClick={fetchLocals}
-            className="px-2.5 md:px-5 py-1.5 md:py-2.5 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-all duration-200 flex items-center gap-1.5 md:gap-2 shadow-sm font-medium border border-orange-600 text-sm flex-shrink-0"
+            className="px-2.5 md:px-5 py-1.5 md:py-2.5 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-all duration-200 flex items-center gap-1.5 md:gap-2 shadow-sm font-medium border border-orange-600 text-sm flex-shrink-0 outline-none"
             aria-label="Refresh locals list"
           >
             <MdRefresh className="text-lg" />

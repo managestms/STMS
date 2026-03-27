@@ -8,6 +8,7 @@ import generatePdf from "../utils/generatePdf.js";
 import Settings from "../models/settings.model.js";
 import generateSlipPdf from "../utils/generateSlipPdf.js";
 import Slip from "../models/slip.model.js";
+import { ImliData } from "../models/imli.model.js";
 
 // CREATE INVOICE
 export const createInvoice = asyncHandler(async (req, res) => {
@@ -64,6 +65,13 @@ export const createInvoice = asyncHandler(async (req, res) => {
       totalWeight,
       totalAmount,
     });
+
+    // Deduct cleaned imli from total stock
+    await ImliData.findOneAndUpdate(
+      {},
+      { $inc: { totalCleanedImli: -totalWeight } },
+      { upsert: true }
+    );
 
     // Generate slip pdf
     const pdf = await generateSlipPdf(slip);

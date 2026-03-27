@@ -65,7 +65,7 @@ function Billing() {
   // Cleaned Imli form data (new)
   const [imliData, setImliData] = useState({
     senderName: "",
-    rows: [{ ...EMPTY_ROW }, { ...EMPTY_ROW }],
+    rows: [{ ...EMPTY_ROW }],
   })
 
   const isImli = formData.productType === "cleaned_imli"
@@ -272,7 +272,7 @@ function Billing() {
     })
     setImliData({
       senderName: "",
-      rows: [{ ...EMPTY_ROW }, { ...EMPTY_ROW }],
+      rows: [{ ...EMPTY_ROW }],
     })
   }
 

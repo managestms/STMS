@@ -2,11 +2,12 @@ import { useState, useEffect } from 'react';
 import {
   MdAdd,
   MdSettings,
-  MdInventory
+  MdInventory,
+  MdTrendingUp,
+  MdTrendingDown,
+  MdDownload
 } from 'react-icons/md';
 import api from "../../api/axios";
-import SackEntry from './SackEntry';
-import { t } from '../../i18n/translations';
 import { useLang } from '../../context/LanguageContext';
 import T from '../../i18n/T';
 import ExcelExport from './ExcelExport';
@@ -49,90 +50,105 @@ const Dashboard = ({ navigateToAssignImli, onPageChange }) => {
   };
 
   useEffect(() => {
-    fetchDashboardData(); // Initial fetch
-
+    fetchDashboardData();
     const intervalId = setInterval(() => {
       fetchDashboardData();
-    }, 1000); // Poll every 1 second
-
+    }, 1000);
     return () => clearInterval(intervalId);
   }, []);
 
   const stats = [
-    { id: 1, title: "Raw Imli", value: `${dashboardStats.rawImli} KG` },
-    { id: 2, title: "Cleaned Imli", value: `${dashboardStats.cleaned} KG` },
-    { id: 3, title: "Distributed Imli to Locals", value: `${dashboardStats.distributed} KG` },
-    { id: 4, title: "Pending Imli to be returned", value: `${dashboardStats.pending} KG` },
+    { id: 1, title: "Raw Imli", value: dashboardStats.rawImli, unit: "KG", icon: MdInventory, color: "orange" },
+    { id: 2, title: "Cleaned Imli", value: dashboardStats.cleaned, unit: "KG", icon: MdTrendingUp, color: "green" },
+    { id: 3, title: "Distributed Imli to Locals", value: dashboardStats.distributed, unit: "KG", icon: MdSettings, color: "purple" },
+    { id: 4, title: "Pending Imli to be returned", value: dashboardStats.pending, unit: "KG", icon: MdTrendingDown, color: "amber" },
   ];
 
+  const colorMap = {
+    orange: { bg: "bg-orange-50", text: "text-orange-500", border: "border-orange-100" },
+    green:  { bg: "bg-green-50",  text: "text-green-500",  border: "border-green-100" },
+    purple: { bg: "bg-purple-50", text: "text-purple-500", border: "border-purple-100" },
+    amber:  { bg: "bg-amber-50",  text: "text-amber-500",  border: "border-amber-100" },
+  };
+
+  const actions = [
+    { key: 'addRawImli', label: "Add Raw Imli Stock", icon: MdAdd, color: "orange" },
+    { key: 'assignImli', label: "Assign Imli", icon: MdSettings, color: "purple" },
+    { key: 'imliReturned', label: "Imli Cleaned", icon: MdInventory, color: "green" },
+  ];
+
+  // Inventory summary data
+  const totalStock = dashboardStats.rawImli + dashboardStats.distributed;
+  const summaryItems = [
+    { label: "Raw Stock", value: dashboardStats.rawImli, total: totalStock || 1, color: "#ea580c" },
+    { label: "Cleaned", value: dashboardStats.cleaned, total: totalStock || 1, color: "#16a34a" },
+    { label: "Distributed", value: dashboardStats.distributed, total: totalStock || 1, color: "#7c3aed" },
+    { label: "Pending Return", value: dashboardStats.pending, total: totalStock || 1, color: "#d97706" },
+  ];
 
   return (
-    <div className="p-3 md:p-6 lg:p-8 bg-orange-50/40 md:bg-gray-50 min-h-full md:min-h-screen overflow-hidden md:overflow-x-hidden flex flex-col">
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-3 md:gap-6 mb-4 md:mb-8 shrink-0">
-        {stats.map((stat, index) => {
-          return (
-            <div
-              key={stat.id}
-              className={`stat-gradient-${index} md:bg-white rounded-2xl md:rounded-xl p-4 md:p-6 shadow-md md:shadow-sm border-0 md:border md:border-gray-100 hover:shadow-lg transition-all duration-300 animate-card-enter animate-delay-${index + 1} flex items-center justify-between md:flex-col md:items-start`}
-            >
-              <p className={`text-gray-600 md:text-gray-500 font-semibold md:font-medium text-sm md:text-sm leading-snug md:mb-3 ${lang === 'ur' ? 'urdu-ui text-right' : ''}`}>
-                <T k={stat.title} />
-              </p>
-              <h3 className="text-2xl md:text-2xl font-extrabold text-gray-900 tracking-tight">
-                {stat.value}
-              </h3>
-            </div>
-          );
-        })}
-      </div>
-
-      {/* Activities and Quick Actions */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 md:gap-6 flex-1 min-h-0 md:mb-8">
-        {/* Sack Entry - Replaces 'Recent Activities' */}
-        <div className="lg:col-span-2 min-h-0 flex flex-col">
-          <SackEntry />
+    <div className="min-h-full flex items-center justify-center bg-gray-50 overflow-hidden py-6 px-4 md:p-8">
+      <div className="w-full max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8 xl:gap-10">
+        
+        {/* ── Stats Section (Left: 2 Columns) ── */}
+        <div className="lg:col-span-2 flex flex-col">
+          <div className="grid grid-cols-2 gap-4 md:gap-6 h-full">
+            {stats.map((stat) => {
+              const c = colorMap[stat.color];
+              const Icon = stat.icon;
+              return (
+                <div
+                  key={stat.id}
+                  className={`bg-white rounded-2xl py-8 px-5 md:py-10 md:px-8 border ${c.border} flex flex-col justify-between transition-all duration-200 hover:shadow-md relative`}
+                >
+                  <div className={`${c.bg} p-2 rounded-lg shrink-0 absolute top-4 md:top-6 ${lang === 'ur' ? 'left-4 md:left-6' : 'right-4 md:right-6'}`}>
+                    <Icon className={`${c.text} text-lg md:text-xl`} />
+                  </div>
+                  <p className={`text-[11px] md:text-xs text-gray-400 font-semibold uppercase tracking-wider leading-snug mb-auto ${lang === 'ur' ? 'urdu-ui text-right pl-10' : 'pr-10'}`}>
+                    <T k={stat.title} />
+                  </p>
+                  <p className={`text-2xl md:text-3xl font-extrabold text-gray-900 tracking-tight leading-none mt-6 ${lang === 'ur' ? 'text-right' : ''}`}>
+                    {stat.value}
+                    <span className={`text-sm font-normal text-gray-400 ${lang === 'ur' ? 'mr-1.5' : 'ml-1.5'}`}>{stat.unit}</span>
+                  </p>
+                </div>
+              );
+            })}
+          </div>
         </div>
 
-        {/* Quick Actions */}
-        <div className="bg-white rounded-2xl md:rounded-xl p-3 md:p-6 shadow-md md:shadow-sm border-0 md:border md:border-gray-200 shrink-0">
-          <h3 className="text-xs md:text-lg font-bold text-gray-900 mb-2.5 md:mb-6">
+        {/* ── Actions Section (Right: 1 Column) ── */}
+        <div className="bg-white border border-gray-150 rounded-2xl p-6 md:p-8 shadow-sm flex flex-col h-full self-stretch">
+          <h3 className={`text-xs md:text-sm font-bold text-gray-800 uppercase tracking-widest mb-6 ${lang === 'ur' ? 'urdu-ui text-right' : ''}`}>
             <T k="Quick Actions" />
           </h3>
+          
+          <div className="flex flex-col gap-3 flex-1 justify-start">
+            {actions.map((action) => {
+              const c = colorMap[action.color];
+              const Icon = action.icon;
+              return (
+                <button
+                  key={action.key}
+                  onClick={() => onPageChange && onPageChange(action.key)}
+                  className={`group flex items-center gap-4 w-full p-3.5 md:p-4 rounded-xl hover:bg-gray-50 border border-transparent hover:border-gray-100 transition-all outline-none active:scale-[0.98] ${lang === 'ur' ? 'flex-row-reverse text-right' : 'text-left'}`}
+                >
+                  <div className={`${c.bg} p-2.5 rounded-lg shrink-0 group-hover:scale-110 transition-transform`}>
+                    <Icon className={`${c.text} text-xl`} />
+                  </div>
+                  <span className={`font-semibold text-gray-700 text-sm md:text-[15px] ${lang === 'ur' ? 'urdu-ui text-right flex-1' : ''}`}>
+                    <T k={action.label} />
+                  </span>
+                </button>
+              );
+            })}
+          </div>
 
-          <div className="space-y-2 md:space-y-3">
-            <button
-              onClick={() => onPageChange && onPageChange('addRawImli')}
-              className="w-full bg-gradient-to-r from-orange-600 to-orange-500 md:bg-none md:bg-orange-600 hover:from-orange-700 hover:to-orange-600 md:hover:bg-orange-700 text-white rounded-xl md:rounded-lg p-2.5 md:p-4 flex items-center justify-center gap-2 md:gap-3 transition-all shadow-lg md:shadow-sm active:scale-[0.98]"
-            >
-              <MdAdd className="text-base md:text-xl" />
-              <span className="font-bold md:font-semibold text-xs md:text-sm"><T k="Add Raw Imli Stock" /></span>
-            </button>
-
-            <div className="grid grid-cols-2 gap-2 md:gap-3">
-              <button
-                onClick={() => onPageChange && onPageChange('assignImli')}
-                className="bg-white md:bg-white border border-gray-100 md:border-gray-200 hover:bg-gray-50 hover:border-gray-300 text-gray-700 rounded-xl md:rounded-lg p-2.5 md:p-4 flex flex-col items-center justify-center gap-1.5 md:gap-2 transition-all shadow-sm md:shadow-sm group active:scale-[0.97]"
-              >
-                <div className="bg-purple-50 p-2 md:p-2 rounded-xl md:rounded-lg group-hover:bg-purple-100 transition-colors">
-                  <MdSettings className="text-purple-600 text-sm md:text-lg" />
-                </div>
-                <span className="text-[10px] md:text-xs font-bold md:font-semibold"><T k="Assign Imli" /></span>
-              </button>
-
-              <button
-                onClick={() => onPageChange && onPageChange('imliReturned')}
-                className="bg-white md:bg-white border border-gray-100 md:border-gray-200 hover:bg-gray-50 hover:border-gray-300 text-gray-700 rounded-xl md:rounded-lg p-2.5 md:p-4 flex flex-col items-center justify-center gap-1.5 md:gap-2 transition-all shadow-sm md:shadow-sm group active:scale-[0.97]"
-              >
-                <div className="bg-green-50 p-2 md:p-2 rounded-xl md:rounded-lg group-hover:bg-green-100 transition-colors">
-                  <MdInventory className="text-green-600 text-sm md:text-lg" />
-                </div>
-                <span className="text-[10px] md:text-xs font-bold md:font-semibold"><T k="Imli Cleaned" /></span>
-              </button>
-            </div>
+          <div className="mt-6 pt-6 border-t border-gray-100 shrink-0">
             <ExcelExport />
           </div>
         </div>
+
       </div>
     </div>
   );
