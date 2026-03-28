@@ -20,7 +20,7 @@ const corsOptions = {
 }
 
 app.use(cors(corsOptions))
-app.options("*", cors(corsOptions))   // handle preflight for ALL routes
+app.options("/*splat", cors(corsOptions))   // handle preflight for ALL routes
 
 // ─── Body Parsers ─────────────────────────────────────────────────────────────
 app.use(express.json({ limit: "16kb" }))
