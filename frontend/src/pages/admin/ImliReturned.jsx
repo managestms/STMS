@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect, useRef, useCallback } from "react"
 import { MdKeyboardReturn, MdSearch, MdPerson, MdScale, MdCancel, MdCheck, MdSchedule, MdLocationOn, MdInventory } from 'react-icons/md'
 import api from "../../api/axios"
 import toast from "react-hot-toast"
@@ -26,25 +26,25 @@ const ImliReturned = () => {
   const [historyLoading, setHistoryLoading] = useState(false)
 
   // Fetch all locals on component mount
-  useEffect(() => {
-    const fetchLocals = async () => {
-      try {
-        const response = await api.post("/return_local")
-        console.log("Locals response:", response.data) // Debug log
-        if (response.data && response.data.data) {
-          setAllLocals(response.data.data)
-          console.log("Locals set:", response.data.data) // Debug log
-        }
-      } catch (error) {
-        toast.error("Failed to fetch locals data")
-        console.error("Error fetching locals:", error)
-      } finally {
-        setFetchingLocals(false)
+  const fetchLocals = useCallback(async () => {
+    try {
+      const response = await api.post("/return_local")
+      console.log("Locals response:", response.data) // Debug log
+      if (response.data && response.data.data) {
+        setAllLocals(response.data.data)
+        console.log("Locals set:", response.data.data) // Debug log
       }
+    } catch (error) {
+      toast.error("Failed to fetch locals data")
+      console.error("Error fetching locals:", error)
+    } finally {
+      setFetchingLocals(false)
     }
-
-    fetchLocals()
   }, [])
+
+  useEffect(() => {
+    fetchLocals()
+  }, [fetchLocals])
 
   // Handle search input change
   const handleSearchChange = (e) => {
@@ -111,7 +111,7 @@ const ImliReturned = () => {
   }, [highlightedIndex, showDropdown])
 
   // Fetch assignment history when a local is selected
-  const fetchAssignmentHistory = async (localID) => {
+  const fetchAssignmentHistory = useCallback(async (localID) => {
     try {
       setHistoryLoading(true)
       const response = await api.get("/assignment-history", { params: { localID } })
@@ -122,7 +122,7 @@ const ImliReturned = () => {
     } finally {
       setHistoryLoading(false)
     }
-  }
+  }, [])
 
   // Handle local selection from dropdown
   const handleSelectLocal = (local) => {

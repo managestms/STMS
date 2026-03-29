@@ -335,51 +335,53 @@ function Billing() {
               </div>
             </div>
 
-            {/* Stepper Progress Bar */}
-            <div className="relative">
-              {/* Connector lines — behind circles */}
-              <div className="absolute top-3.5 md:top-[18px] left-0 right-0 flex items-center px-[10%] md:px-[10%] pointer-events-none" style={{ paddingLeft: `${100 / STEPS.length / 2}%`, paddingRight: `${100 / STEPS.length / 2}%` }}>
-                {STEPS.slice(0, -1).map((step, index) => (
-                  <div key={index} className="flex-1">
-                    <div className={`h-0.5 transition-all duration-300 ${currentStep > step.id ? "bg-orange-500" : "bg-gray-200"}`}></div>
-                  </div>
-                ))}
-              </div>
-
-              {/* Step circles + labels — on top */}
-              <div className="relative z-10 flex items-start">
-                {STEPS.map((step) => {
-                  const isActive = currentStep === step.id
-                  const isCompleted = currentStep > step.id
-                  return (
-                    <div key={step.id} className="flex flex-col items-center" style={{ width: `${100 / STEPS.length}%` }}>
-                      <div
-                        className={`w-7 h-7 md:w-9 md:h-9 rounded-full flex items-center justify-center text-xs md:text-sm font-bold transition-all duration-300 ${isCompleted
-                          ? "bg-orange-500 text-white shadow-sm"
-                          : isActive
-                            ? "bg-orange-500 text-white ring-4 ring-orange-500/20 shadow-md"
-                            : "bg-gray-100 text-gray-400 border-2 border-gray-200"
-                          }`}
-                      >
-                        {isCompleted ? (
-                          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                          </svg>
-                        ) : (
-                          step.id
-                        )}
-                      </div>
-                      <span
-                        className={`mt-1 md:mt-2 text-[10px] md:text-xs font-medium whitespace-nowrap ${isActive || isCompleted ? "text-orange-600" : "text-gray-400"
-                          }`}
-                      >
-                        {step.label}
-                      </span>
+            {/* Stepper Progress Bar - Only visible after step 1 */}
+            {currentStep > 1 && (
+              <div className="relative mt-4">
+                {/* Connector lines — behind circles */}
+                <div className="absolute top-3.5 md:top-[18px] left-0 right-0 flex items-center px-[10%] md:px-[10%] pointer-events-none" style={{ paddingLeft: `${100 / STEPS.length / 2}%`, paddingRight: `${100 / STEPS.length / 2}%` }}>
+                  {STEPS.slice(0, -1).map((step, index) => (
+                    <div key={index} className="flex-1">
+                      <div className={`h-0.5 transition-all duration-300 ${currentStep > step.id ? "bg-orange-500" : "bg-gray-200"}`}></div>
                     </div>
-                  )
-                })}
+                  ))}
+                </div>
+
+                {/* Step circles + labels — on top */}
+                <div className="relative z-10 flex items-start">
+                  {STEPS.map((step) => {
+                    const isActive = currentStep === step.id
+                    const isCompleted = currentStep > step.id
+                    return (
+                      <div key={step.id} className="flex flex-col items-center" style={{ width: `${100 / STEPS.length}%` }}>
+                        <div
+                          className={`w-7 h-7 md:w-9 md:h-9 rounded-full flex items-center justify-center text-xs md:text-sm font-bold transition-all duration-300 ${isCompleted
+                            ? "bg-orange-500 text-white shadow-sm"
+                            : isActive
+                              ? "bg-orange-500 text-white ring-4 ring-orange-500/20 shadow-md"
+                              : "bg-gray-100 text-gray-400 border-2 border-gray-200"
+                            }`}
+                        >
+                          {isCompleted ? (
+                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                            </svg>
+                          ) : (
+                            step.id
+                          )}
+                        </div>
+                        <span
+                          className={`mt-1 md:mt-2 text-[10px] md:text-xs font-medium whitespace-nowrap ${isActive || isCompleted ? "text-orange-600" : "text-gray-400"
+                            }`}
+                        >
+                          {step.label}
+                        </span>
+                      </div>
+                    )
+                  })}
+                </div>
               </div>
-            </div>
+            )}
           </div>
 
           {/* Step Content */}

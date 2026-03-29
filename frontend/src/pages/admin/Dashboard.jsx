@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
   MdAdd,
   MdSettings,
@@ -18,7 +18,7 @@ import TrendChart from '../../components/dashboard/TrendChart';
 import DistributionChart from '../../components/dashboard/DistributionChart';
 import RecentActivity from '../../components/dashboard/RecentActivity';
 
-const Dashboard = ({ navigateToAssignImli, onPageChange }) => {
+const Dashboard = ({ onPageChange }) => {
   const { lang } = useLang();
   const [dashboardStats, setDashboardStats] = useState({
     rawImli: 0,
@@ -29,7 +29,7 @@ const Dashboard = ({ navigateToAssignImli, onPageChange }) => {
   const [activities, setActivities] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const fetchDashboardData = async (isInitial = false) => {
+  const fetchDashboardData = useCallback(async (isInitial = false) => {
     if (isInitial) setLoading(true);
     try {
       const [localsRes, rawImliRes] = await Promise.all([
@@ -58,9 +58,9 @@ const Dashboard = ({ navigateToAssignImli, onPageChange }) => {
     } finally {
       if (isInitial) setLoading(false);
     }
-  };
+  }, []);
 
-  const fetchActivities = async () => {
+  const fetchActivities = useCallback(async () => {
     try {
       const response = await api.get("/dashboard/activity");
       if (response.data && response.data.data) {
@@ -69,7 +69,7 @@ const Dashboard = ({ navigateToAssignImli, onPageChange }) => {
     } catch (error) {
       console.error("Error fetching activities:", error);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchDashboardData(true);
@@ -79,7 +79,7 @@ const Dashboard = ({ navigateToAssignImli, onPageChange }) => {
       fetchActivities();
     }, 10000); // Poll every 10 seconds for real-time updates
     return () => clearInterval(intervalId);
-  }, []);
+  }, [fetchDashboardData, fetchActivities]);
 
   const stats = [
     { id: 1, title: "Raw Imli", value: dashboardStats.rawImli, unit: "KG", icon: MdInventory, color: "orange" },

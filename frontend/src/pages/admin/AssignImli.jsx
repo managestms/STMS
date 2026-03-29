@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect, useRef, useCallback } from "react"
 import { MdAssignment, MdSearch, MdPerson, MdScale, MdCancel, MdCheck, MdSchedule, MdLocationOn } from 'react-icons/md'
 import api from "../../api/axios"
 import toast from "react-hot-toast"
@@ -24,25 +24,25 @@ const AssignImli = ({ prefilledLocalId, prefilledLocal }) => {
   const [fetchingLocals, setFetchingLocals] = useState(true)
 
   // Fetch all locals on component mount
-  useEffect(() => {
-    const fetchLocals = async () => {
-      try {
-        const response = await api.post("/return_local")
-        console.log("Locals response:", response.data) // Debug log
-        if (response.data && response.data.data) {
-          setAllLocals(response.data.data)
-          console.log("Locals set:", response.data.data) // Debug log
-        }
-      } catch (error) {
-        toast.error("Failed to fetch locals data")
-        console.error("Error fetching locals:", error)
-      } finally {
-        setFetchingLocals(false)
+  const fetchLocals = useCallback(async () => {
+    try {
+      const response = await api.post("/return_local")
+      console.log("Locals response:", response.data) // Debug log
+      if (response.data && response.data.data) {
+        setAllLocals(response.data.data)
+        console.log("Locals set:", response.data.data) // Debug log
       }
+    } catch (error) {
+      toast.error("Failed to fetch locals data")
+      console.error("Error fetching locals:", error)
+    } finally {
+      setFetchingLocals(false)
     }
-
-    fetchLocals()
   }, [])
+
+  useEffect(() => {
+    fetchLocals()
+  }, [fetchLocals])
 
   // Handle prefilled local data
   useEffect(() => {

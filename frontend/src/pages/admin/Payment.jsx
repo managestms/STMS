@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef, useCallback } from "react"
 import { MdPayment, MdRefresh, MdSearch, MdError, MdKeyboardArrowDown, MdKeyboardArrowUp, MdCheckCircle, MdMoney, MdPayment as MdOnlinePayment, MdHistory } from 'react-icons/md'
 
 import api from "../../api/axios"
@@ -23,13 +23,9 @@ const Payment = () => {
     const [activeTab, setActiveTab] = useState("payment")
     const [assignmentHistory, setAssignmentHistory] = useState([])
     const [historyLoading, setHistoryLoading] = useState(false)
+    const localRefs = useRef({})
 
-
-    useEffect(() => {
-        fetchLocals()
-    }, [])
-
-    const fetchLocals = async (silent = false) => {
+    const fetchLocals = useCallback(async (silent = false) => {
         try {
             if (!silent) setLoading(true)
             setError(null)
@@ -44,7 +40,25 @@ const Payment = () => {
         } finally {
             if (!silent) setLoading(false)
         }
-    }
+    }, [])
+
+    useEffect(() => {
+        fetchLocals()
+    }, [fetchLocals])
+
+    // 👉 Auto-scroll to expanded local
+    useEffect(() => {
+        if (expandedLocalId && localRefs.current[expandedLocalId]) {
+            // Wait slightly for the animation to start/content to render
+            const timer = setTimeout(() => {
+                localRefs.current[expandedLocalId]?.scrollIntoView({
+                    behavior: "smooth",
+                    block: "center",
+                })
+            }, 100)
+            return () => clearTimeout(timer)
+        }
+    }, [expandedLocalId])
 
     useEffect(() => {
         const debounceTimer = setTimeout(() => {
@@ -60,7 +74,7 @@ const Payment = () => {
         return () => clearTimeout(debounceTimer)
     }, [searchTerm, locals])
 
-    const fetchAssignmentHistory = async (localID) => {
+    const fetchAssignmentHistory = useCallback(async (localID) => {
         try {
             setHistoryLoading(true)
             const response = await api.get("/assignment-history", { params: { localID } })
@@ -71,9 +85,9 @@ const Payment = () => {
         } finally {
             setHistoryLoading(false)
         }
-    }
+    }, [])
 
-    const fetchOrderReference = async (localID) => {
+    const fetchOrderReference = useCallback(async (localID) => {
         try {
             setOrderLoading(true)
             setOrderData(null)
@@ -92,7 +106,7 @@ const Payment = () => {
         } finally {
             setOrderLoading(false)
         }
-    }
+    }, [])
 
     const toggleExpand = (local) => {
         if (expandedLocalId === local._id) {
@@ -113,7 +127,7 @@ const Payment = () => {
     }
 
 
-    const handleConfirmPayment = async (localId) => {
+    const handleConfirmPayment = useCallback(async (localId) => {
         if (!orderData) return
         try {
             setPaymentLoading(true)
@@ -135,10 +149,10 @@ const Payment = () => {
         } finally {
             setPaymentLoading(false)
         }
-    }
+    }, [orderData, paymentMethod, fetchLocals])
 
     // Online Step 2: Admin confirms SUCCESS or REJECTED
-    const handleOnlineStatus = async (localId, newStatus) => {
+    const handleOnlineStatus = useCallback(async (localId, newStatus) => {
         try {
             setPaymentLoading(true)
             setPaymentError(null)
@@ -154,7 +168,7 @@ const Payment = () => {
         } finally {
             setPaymentLoading(false)
         }
-    }
+    }, [fetchLocals])
 
     if (loading) {
         return (
@@ -252,7 +266,11 @@ const Payment = () => {
                         const assignedQty = local.totalAssignedQuantity || 0
 
                         return (
-                            <div key={local._id} className={`bg-white rounded-2xl shadow-sm border transition-all duration-300 overflow-hidden ${isExpanded ? 'border-orange-500 ring-1 ring-orange-500/20 shadow-orange-100 shadow-xl' : 'border-gray-200 hover:border-orange-300'}`}>
+                            <div 
+                                key={local._id} 
+                                ref={el => localRefs.current[local._id] = el}
+                                className={`bg-white rounded-2xl shadow-sm border transition-all duration-300 overflow-hidden ${isExpanded ? 'border-orange-500 ring-1 ring-orange-500/20 shadow-orange-100 shadow-xl' : 'border-gray-200 hover:border-orange-300'}`}
+                            >
                                 {/* Header Row */}
                                 <div className={`p-2.5 md:p-3 flex items-center justify-between cursor-pointer transition-colors ${isExpanded ? 'bg-orange-50/30' : 'bg-white hover:bg-gray-50'}`} onClick={() => toggleExpand(local)}>
                                     <div className="flex items-center space-x-2.5 md:space-x-3">
