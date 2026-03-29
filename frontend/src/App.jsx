@@ -12,6 +12,8 @@ import A_Dashboard from "./pages/admin/AdminLayout"
 import O_Dashboard from "./pages/operator/O_Dashboard"
 import O_AddImli from "./pages/operator/O_Addimli"
 
+import PWAUpdatePrompt from "./components/PWAUpdatePrompt"
+
 function App() {
   return (
     <LanguageProvider>
@@ -31,6 +33,7 @@ function App() {
             <Route path="/operator/dashboard" element={<O_Dashboard />} />
 
           </Routes>
+          <PWAUpdatePrompt />
         </BrowserRouter>
       </ThemeProvider>
     </LanguageProvider>
