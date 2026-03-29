@@ -6,6 +6,11 @@
     line-height: 1.8;
 }
 
+/* 👉 Globally remove all box shadows across the frontend UI */
+* {
+    box-shadow: none !important;
+}
+
 /* Only Urdu display strings get Nastaliq — English text is never touched */
 .nastaliq-text {
     font-family: 'Noto Nastaliq Urdu', serif;
