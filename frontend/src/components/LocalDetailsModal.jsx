@@ -83,7 +83,7 @@ const LocalDetailsModal = ({ isOpen, onClose, local, onDelete }) => {
     <div className="fixed inset-0 z-40 overflow-hidden">
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-black/40 backdrop-blur-sm transition-all duration-300"
+        className="fixed inset-0 bg-black/60 transition-all duration-300"
         onClick={onClose}
       />
 
@@ -102,7 +102,7 @@ const LocalDetailsModal = ({ isOpen, onClose, local, onDelete }) => {
             </button>
 
             {/* Avatar + Name */}
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-4 pr-10">
               <div className="w-14 h-14 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-white text-2xl font-bold border-2 border-white/30">
                 {(formData.LocalName || local.LocalName || "U").charAt(0).toUpperCase()}
               </div>
@@ -265,7 +265,7 @@ const LocalDetailsModal = ({ isOpen, onClose, local, onDelete }) => {
 
           {/* ─── Delete Confirmation ─── */}
           {showConfirmDelete && (
-            <div className="absolute inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center rounded-2xl z-20">
+            <div className="absolute inset-0 bg-black/60 flex items-center justify-center rounded-2xl z-20">
               <div className="bg-white rounded-2xl p-5 max-w-xs mx-4 shadow-2xl">
                 <div className="text-center mb-4">
                   <div className="w-12 h-12 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-3">

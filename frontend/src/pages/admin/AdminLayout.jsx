@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect, useCallback, useRef } from "react"
 import { useParams, useNavigate } from "react-router-dom"
 import Sidebar from "./Sidebar"
 import Header from "./Header"
@@ -24,9 +24,18 @@ const AdminLayout = () => {
 
   const activePage = ["dashboard", "addLocals", "addRawImli", "assignImli", "imliReturned", "localsProfile", "payment", "billing", "settings"].includes(page) ? page : "dashboard"
 
+  const scrollRef = useRef(null)
+
   useEffect(() => {
     if (activePage !== "assignImli") {
       setNavigationProps({})
+    }
+  }, [activePage])
+
+  // Scroll to top of the inner container whenever the active page changes
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTo(0, 0)
     }
   }, [activePage])
 
@@ -65,7 +74,7 @@ const AdminLayout = () => {
         <Header
           title={currentPage.title}
         />
-        <div className="flex-1 overflow-y-auto pb-20 md:pb-0">
+        <div ref={scrollRef} className="flex-1 overflow-y-auto pb-20 md:pb-0">
           <CurrentComponent {...currentPage.props} />
         </div>
       </div>

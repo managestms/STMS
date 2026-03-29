@@ -11,6 +11,7 @@ import api from "../../api/axios";
 import { useLang } from '../../context/LanguageContext';
 import T from '../../i18n/T';
 import ExcelExport from './ExcelExport';
+import { CardSkeleton } from '../../components/Skeletons';
 
 const Dashboard = ({ navigateToAssignImli, onPageChange }) => {
   const { lang } = useLang();
@@ -20,8 +21,10 @@ const Dashboard = ({ navigateToAssignImli, onPageChange }) => {
     cleaned: 0,
     pending: 0
   });
+  const [loading, setLoading] = useState(true);
 
-  const fetchDashboardData = async () => {
+  const fetchDashboardData = async (isInitial = false) => {
+    if (isInitial) setLoading(true);
     try {
       const [localsRes, rawImliRes] = await Promise.all([
         api.get("/return_local"),
@@ -46,13 +49,15 @@ const Dashboard = ({ navigateToAssignImli, onPageChange }) => {
       });
     } catch (error) {
       console.error("Error fetching dashboard data:", error);
+    } finally {
+      if (isInitial) setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchDashboardData();
+    fetchDashboardData(true);
     const intervalId = setInterval(() => {
-      fetchDashboardData();
+      fetchDashboardData(false);
     }, 1000);
     return () => clearInterval(intervalId);
   }, []);
@@ -93,9 +98,12 @@ const Dashboard = ({ navigateToAssignImli, onPageChange }) => {
         {/* ── Stats Section (Left: 2 Columns) ── */}
         <div className="lg:col-span-2 flex flex-col">
           <div className="grid grid-cols-2 gap-4 md:gap-6 h-full">
-            {stats.map((stat) => {
-              const c = colorMap[stat.color];
-              const Icon = stat.icon;
+            {loading ? (
+              Array.from({ length: 4 }).map((_, i) => <CardSkeleton key={`skeleton-${i}`} />)
+            ) : (
+              stats.map((stat) => {
+                const c = colorMap[stat.color];
+                const Icon = stat.icon;
               return (
                 <div
                   key={stat.id}
@@ -107,13 +115,13 @@ const Dashboard = ({ navigateToAssignImli, onPageChange }) => {
                   <p className={`text-[11px] md:text-xs text-gray-400 font-semibold uppercase tracking-wider leading-snug mb-auto ${lang === 'ur' ? 'urdu-ui text-right pl-10' : 'pr-10'}`}>
                     <T k={stat.title} />
                   </p>
-                  <p className={`text-2xl md:text-3xl font-extrabold text-gray-900 tracking-tight leading-none mt-6 ${lang === 'ur' ? 'text-right' : ''}`}>
-                    {stat.value}
-                    <span className={`text-sm font-normal text-gray-400 ${lang === 'ur' ? 'mr-1.5' : 'ml-1.5'}`}>{stat.unit}</span>
+                  <p className={`text-3xl md:text-7xl font-extrabold ${c.text} tracking-tight leading-none mt-4 md:mt-6 ${lang === 'ur' ? 'text-right' : ''}`}>
+                    <span className="font-calculator text-[130%] inline-block align-middle">{stat.value}</span>
+                    <span className={`text-[10px] md:text-base font-sans font-normal text-gray-400 align-baseline ${lang === 'ur' ? 'mr-1' : 'ml-1'}`}>{stat.unit}</span>
                   </p>
                 </div>
               );
-            })}
+            }))}
           </div>
         </div>
 

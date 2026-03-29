@@ -128,7 +128,15 @@ export default function Settings() {
                 <div className="flex flex-col md:flex-row gap-4 md:gap-6">
                     {/* Sidebar — horizontal tabs on mobile, vertical on desktop */}
                     <div className="w-full md:w-64 shrink-0">
-                        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden p-1.5 md:p-2 flex md:flex-col gap-1">
+                        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-1.5 md:p-2 relative flex md:flex-col gap-1 z-0">
+                            {/* Mobile Sliding Pill */}
+                            <div className="absolute inset-1.5 md:hidden pointer-events-none z-0">
+                                <div
+                                    className="h-full w-[calc(50%-2px)] bg-orange-600 shadow-md shadow-orange-200 rounded-xl transition-transform duration-100 ease-in-out"
+                                    style={{ transform: activeTab === 'business' ? 'translateX(calc(100% + 4px))' : 'translateX(0)' }}
+                                />
+                            </div>
+
                             {sidebarItems.map((item) => (
                                 <button
                                     key={item.id}
@@ -137,9 +145,9 @@ export default function Settings() {
                                         setSuccessMessage("")
                                         setErrorMessage("")
                                     }}
-                                    className={`flex-1 md:flex-none w-full flex items-center justify-center md:justify-start gap-2 md:gap-3 px-3 md:px-4 py-2.5 md:py-3 rounded-xl font-semibold text-xs md:text-sm transition-all duration-200 ${activeTab === item.id
-                                        ? 'bg-orange-600 text-white shadow-md shadow-orange-200'
-                                        : 'text-gray-500 hover:bg-orange-50 hover:text-orange-600'
+                                    className={`relative z-10 flex-1 md:flex-none w-full flex items-center justify-center md:justify-start gap-2 md:gap-3 px-3 md:px-4 py-2.5 md:py-3 rounded-xl font-semibold text-xs md:text-sm transition-colors duration-200 ${activeTab === item.id
+                                            ? 'text-white md:bg-orange-600 md:shadow-md md:shadow-orange-200'
+                                            : 'text-gray-500 hover:bg-orange-50 hover:text-orange-600'
                                         }`}
                                 >
                                     <item.icon className="text-lg md:text-xl" />
@@ -152,7 +160,7 @@ export default function Settings() {
                     {/* Content Panel */}
                     <div className="flex-1 bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden relative min-h-[300px] md:min-h-[500px]">
                         {pageLoading && (
-                            <div className="absolute inset-0 bg-white/70 backdrop-blur-[1px] z-10 flex items-center justify-center">
+                            <div className="absolute inset-0 bg-white/80 z-10 flex items-center justify-center">
                                 <div className="flex flex-col items-center gap-3">
                                     <div className="w-8 h-8 md:w-10 md:h-10 border-3 md:border-4 border-orange-600 border-t-transparent rounded-full animate-spin"></div>
                                     <p className="text-orange-600 font-semibold text-sm animate-pulse"><T k="Loading..." /></p>

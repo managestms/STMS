@@ -5,6 +5,7 @@ import { IoEye, IoPencil, IoAdd } from "react-icons/io5"
 import LocalDetailsModal from "../../components/LocalDetailsModal"
 import { useLang } from "../../context/LanguageContext"
 import T from "../../i18n/T"
+import { TableSkeleton, ListItemSkeleton } from "../../components/Skeletons"
 
 const LocalsProfile = ({ navigateToAssignImli }) => {
   const { lang } = useLang()
@@ -84,14 +85,12 @@ const LocalsProfile = ({ navigateToAssignImli }) => {
 
   if (loading) {
     return (
-      <div className="p-3 md:p-6 lg:p-8 bg-white min-h-screen flex items-center justify-center overflow-x-hidden">
-        <div className="text-center">
-          <div className="bg-orange-50 w-16 md:w-24 h-16 md:h-24 rounded-full flex items-center justify-center mx-auto mb-4 md:mb-6 shadow-sm border border-orange-200">
-            <div className="w-8 md:w-12 h-8 md:h-12 border-3 md:border-4 border-orange-500 border-t-transparent rounded-full animate-spin"></div>
-          </div>
-          <div className="text-xl md:text-2xl font-bold text-gray-800 mb-1 md:mb-2"><T k="Loading Locals..." /></div>
-          <div className="text-gray-600 text-sm md:text-base"><T k="Please wait while we fetch the data" /></div>
+      <div className="p-3 md:p-6 lg:p-8 bg-white min-h-screen overflow-x-hidden">
+        <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-3 md:p-4 mb-4 md:mb-6 animate-pulse">
+            <div className="h-10 md:h-12 bg-gray-200 rounded-lg w-full"></div>
         </div>
+        <TableSkeleton rows={6} columns={3} />
+        <ListItemSkeleton count={6} />
       </div>
     )
   }

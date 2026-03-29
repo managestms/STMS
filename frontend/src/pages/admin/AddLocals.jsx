@@ -122,24 +122,7 @@ export default function AddLocals() {
         <div className="min-h-screen bg-white p-3 md:p-6 overflow-x-hidden">
             <div className="max-w-4xl mx-auto">
                 <div className="bg-white md:rounded-xl md:shadow-sm md:border md:border-gray-200 overflow-hidden">
-                    {/* Header */}
-                    <div className="bg-white px-4 md:px-8 py-4 md:py-6 md:border-b md:border-gray-100">
-                        <div className="flex justify-between items-center">
-                            <div className="bg-orange-50 p-2 md:p-3 rounded-lg md:border md:border-orange-100">
-                                <MdPersonAdd className="text-xl md:text-2xl text-orange-600" />
-                            </div>
-                            <div className="hidden md:flex items-center gap-2 bg-gray-50 rounded-lg px-3 py-1.5 border border-gray-100">
-                                <MdSchedule className="text-gray-400" />
-                                <p className="text-gray-500 text-xs font-medium">
-                                    {new Date().toLocaleDateString("en-US", {
-                                        year: "numeric",
-                                        month: "short",
-                                        day: "numeric",
-                                    })}
-                                </p>
-                            </div>
-                        </div>
-                    </div>
+
 
                     {/* Content */}
                     <div className="px-4 md:px-8 py-5 md:py-8">

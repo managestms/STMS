@@ -19,7 +19,7 @@ const SuccessModal = ({ isOpen, onClose, title, message, subMessage }) => {
         <div className={`fixed inset-0 z-50 flex items-center justify-center p-4 transition-all duration-300 ${isOpen ? "opacity-100" : "opacity-0 pointer-events-none"}`}>
             {/* Backdrop */}
             <div
-                className="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity"
+                className="absolute inset-0 bg-black/60 transition-opacity"
                 onClick={onClose}
             />
 

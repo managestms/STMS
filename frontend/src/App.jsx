@@ -5,6 +5,8 @@ import { LanguageProvider } from "./context/LanguageContext"
 import LandingPage from "./pages/LandingPage"
 import Login from "./pages/Login"
 
+import ScrollToTop from "./components/common/ScrollToTop"
+
 // admin
 import A_Dashboard from "./pages/admin/AdminLayout"
 
@@ -19,6 +21,7 @@ function App() {
     <LanguageProvider>
       <ThemeProvider>
         <BrowserRouter>
+          <ScrollToTop />
           <Routes>
 
             {/* public */}
